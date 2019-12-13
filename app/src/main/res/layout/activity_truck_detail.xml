@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+            android:id="@+id/content_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_constraint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".ui.truck_detail.TruckDetailActivity">
+
+            <TextView
+                    android:id="@+id/tv_today_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="7/8/19, 4:58 PM" />
+
+            <ImageView
+                    android:id="@+id/iv_mk_logo"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/logo_black"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_today_date" />
+
+            <TextView
+                    android:id="@+id/tv_company_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="EMKAY INTERNATIONAL LTD"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_mk_logo" />
+
+            <TextView
+                    android:id="@+id/tv_loading_order"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="LOADING ORDER"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_company_name" />
+
+
+            <TextView
+                    android:id="@+id/tv_truck_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_loading_order"
+                    tools:text="MK0390" />
+
+            <TextView
+                    android:id="@+id/tv_depot_name_d"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="[  ]"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_truck_id" />
+
+            <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="16dp" />
+
+
+            <View
+                    android:id="@+id/v_top_separator"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/colorDivider"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_depot_name_d" />
+
+
+            <TextView
+                    android:id="@+id/tv_customer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="CUSTOMER"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/v_top_separator" />
+
+
+            <TextView
+                    android:id="@+id/tv_customer_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/tv_customer"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_customer"
+                    tools:text="MAFUKO MERU" />
+
+            <TextView
+                    android:id="@+id/tv_driver_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="DRIVER NAME"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_customer" />
+
+
+            <EditText
+                    android:id="@+id/et_driver_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Driver Name"
+                    android:inputType="textFilter|textNoSuggestions|textMultiLine"
+                    android:maxLines="3"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_driver_name"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_customer" />
+
+
+            <TextView
+                    android:id="@+id/tv_driver_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="DRIVER ID/PASSPORT"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/et_driver_name" />
+
+            <EditText
+                    android:id="@+id/et_driver_id"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Driver Id"
+                    android:inputType="textFilter|textNoSuggestions"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_driver_id"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_driver_id" />
+
+            <TextView
+                    android:id="@+id/tv_driver_plate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="NUMBER PLATE"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/et_driver_id" />
+
+
+            <EditText
+                    android:id="@+id/et_driver_plate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Number Plate"
+                    android:inputType="textFilter|textNoSuggestions"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_driver_plate"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_driver_plate" />
+
+
+            <View
+                    android:id="@+id/v_sale_separator"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/colorDivider"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_driver_plate" />
+
+
+            <TextView
+                    android:id="@+id/tv_sale_order"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="SALE ORDER"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/v_sale_separator" />
+
+
+            <TextView
+                    android:id="@+id/tv_product"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="PRODUCT"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_sale_order" />
+
+            <TextView
+                    android:id="@+id/tv_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:text="ENTRY NUMBER"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_sale_order" />
+
+
+            <TextView
+                    android:id="@+id/tv_pms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="PMS [ 1000 ]"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_product" />
+
+            <TextView
+                    android:id="@+id/tv_pms_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_pms"
+                    app:layout_constraintStart_toStartOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_pms"
+                    tools:text="018ASDCJ113" />
+
+            <TextView
+                    android:id="@+id/tv_ago"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_pms"
+                    tools:text="AGO [ 0 ]" />
+
+            <TextView
+                    android:id="@+id/tv_ago_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:text="*******"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_ago"
+                    app:layout_constraintStart_toStartOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_ago" />
+
+
+            <TextView
+                    android:id="@+id/tv_ik"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_ago"
+                    tools:text="IK      [ 0 ]" />
+
+            <TextView
+                    android:id="@+id/tv_ik_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:text="*******"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_ik"
+                    app:layout_constraintStart_toStartOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_ik" />
+
+
+            <View
+                    android:id="@+id/v_compartments_separator"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/colorDivider"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_ik" />
+
+
+            <TextView
+                    android:id="@+id/tv_compartments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="COMPARTMENTS DETAILS"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/v_compartments_separator" />
+
+
+            <TextView
+                    android:id="@+id/tv_c1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 1"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c1_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_compartments" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c1_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c1_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c1"
+                    app:layout_constraintTop_toBottomOf="@id/tv_compartments"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c1_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="number"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c1_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_compartments"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 2"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c2_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c1" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c2_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c2_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c2"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c1" />
+
+            <EditText
+                    android:id="@+id/et_c2_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c2_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c1"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 3"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c3_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c2" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c3_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c3_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c3"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c2"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c3_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c3_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c2"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 4"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c4_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c3" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c4_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c4_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c4"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c3"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c4_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c4_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c3"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 5"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c5_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c4" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c5_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c5_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c5"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c4"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c5_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c5_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c4"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 6"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c6_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c5" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c6_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c6_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c6"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c5"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c6_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c6_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c5"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <TextView
+                    android:id="@+id/tv_c7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="COMP 7"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c7_type"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c6" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/et_c7_type"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="EMPTY"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/et_c7_qty"
+                    app:layout_constraintStart_toEndOf="@+id/tv_c7"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c6"
+                    tools:layout_editor_absoluteY="627dp" />
+
+            <EditText
+                    android:id="@+id/et_c7_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="Enter Amount"
+                    android:inputType="textCapCharacters"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_500"
+                    android:textColorHint="@color/grey_500"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/et_c7_type"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c6"
+                    tools:layout_editor_absoluteY="627dp" />
+
+
+            <View
+                    android:id="@+id/v_bottom_separator"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/colorDivider"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_c7" />
+
+
+            <TextView
+                    android:id="@+id/tv_auth_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="AUTHORIZED BY"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/v_bottom_separator" />
+
+
+            <TextView
+                    android:id="@+id/tv_auth_by_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/v_bottom_separator"
+                    tools:text="KAMANA KISINGA" />
+
+
+            <TextView
+                    android:id="@+id/tv_confirmed_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="CONFIRMED BY"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_auth_by" />
+
+
+            <TextView
+                    android:id="@+id/tv_confirmed_by_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintTop_toBottomOf="@id/tv_auth_by"
+                    tools:text="KAMANA KISINGA" />
+
+
+            <TextView
+                    android:id="@+id/tv_signature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="SIGNATURE"
+                    android:textSize="@dimen/text_prefered_size"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tv_confirmed_by_value" />
+
+
+            <View
+                    android:id="@+id/v_signature"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="#000"
+                    app:layout_constraintBaseline_toBaselineOf="@id/tv_signature"
+                    app:layout_constraintLeft_toLeftOf="@id/barrier"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_confirmed_by_value" />
+
+
+            <ImageView
+                    android:id="@+id/qr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/v_signature" />
+
+
+            <View
+                    android:id="@+id/stamp_area"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    app:layout_constraintTop_toBottomOf="@id/qr" />
+
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="right"
+                    app:constraint_referenced_ids="tv_customer, tv_driver_name, tv_driver_id, tv_auth_by"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintLeft_toRightOf="parent" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPrint"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:text="print"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/stamp_area" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

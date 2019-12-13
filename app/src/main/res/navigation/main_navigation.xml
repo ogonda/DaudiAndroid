@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main_navigation"
+            app:startDestination="@id/processing">
+
+    <fragment
+            android:id="@+id/processing"
+            android:name="com.zeroq.daudi4native.ui.processing.ProcessingFragment"
+            android:label="Processing"
+            tools:layout="@layout/fragment_processing"/>
+
+    <fragment
+            android:id="@+id/queued"
+            android:name="com.zeroq.daudi4native.ui.queued.QueuedFragment"
+            android:label="Queued"
+            tools:layout="@layout/fragment_queued"/>
+
+    <fragment
+            android:id="@+id/loading"
+            android:name="com.zeroq.daudi4native.ui.loading.LoadingFragment"
+            android:label="Loading"
+            tools:layout="@layout/fragment_loading"/>
+
+</navigation>

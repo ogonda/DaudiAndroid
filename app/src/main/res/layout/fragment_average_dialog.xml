@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="16dp">
+
+    <TextView android:id="@+id/tv_dialog_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Enter Omc Fuel Price"
+              android:layout_gravity="center"
+              android:layout_marginBottom="10dp"
+              android:textAppearance="?attr/textAppearanceHeadline6"/>
+
+
+    <View android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_margin="10dp"
+          android:layout_marginBottom="16dp"
+          android:background="@color/colorDivider"/>
+
+
+    <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+
+    <EditText
+            android:id="@+id/pmsPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Pms price"
+            android:inputType="number"
+            android:digits="0123456789."
+            android:textColor="@color/grey_700"
+            android:textColorHint="@color/grey_500"/>
+
+
+    <EditText
+            android:id="@+id/agoPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Ago price"
+            android:inputType="number"
+            android:digits="0123456789."
+            android:textColor="@color/grey_700"
+            android:textColorHint="@color/grey_500"/>
+
+
+    <EditText
+            android:id="@+id/ikPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="IK price"
+            android:inputType="number"
+            android:digits="0123456789."
+            android:textColor="@color/grey_700"
+            android:textColorHint="@color/grey_500"/>
+
+
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_gravity="end"
+                  android:layout_marginTop="16dp"
+                  android:layout_alignParentBottom="true"
+                  android:layout_alignParentEnd="true">
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/fuelCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                style="?android:attr/borderlessButtonStyle"
+                android:textColor="@color/pms"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/fuelSubmit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/submit"
+                android:textColor="@color/colorPrimary"
+                style="?android:attr/borderlessButtonStyle"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

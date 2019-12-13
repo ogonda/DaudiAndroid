@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:padding="16dp"
+              android:layout_height="wrap_content">
+
+
+    <TextView android:id="@+id/tv_dialog_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Enter Seal Information"
+              android:layout_gravity="center"
+              android:textAppearance="?attr/textAppearanceHeadline6"/>
+
+    <TextView android:id="@+id/tv_loading_truck_id"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              tools:text="Truck MK039"
+              android:layout_gravity="center"/>
+
+
+    <View android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_margin="10dp"
+          android:layout_marginBottom="16dp"
+          android:background="@color/colorDivider"/>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <ScrollView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/scroll">
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical">
+
+                <EditText
+                        android:id="@+id/et_pms_actual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/actual_pms_amount_loaded"
+                        android:inputType="number"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+
+                <EditText
+                        android:id="@+id/et_ago_actual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/actual_ago_amount_loaded"
+                        android:inputType="number"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+
+                <EditText
+                        android:id="@+id/et_ik_actual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/actual_ik_amount_loaded"
+                        android:inputType="number"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+
+                <EditText
+                        android:id="@+id/et_seal_range"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/provide_seal_number_range"
+                        android:inputType="text"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+
+                <EditText
+                        android:id="@+id/et_broken_seal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/provide_broken_seals"
+                        android:inputType="text"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+
+                <EditText
+                        android:id="@+id/et_delivery_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed"
+                        android:hint="@string/delivery_note_number"
+                        android:inputType="text"
+                        android:textColor="@color/grey_700"
+                        android:textColorHint="@color/grey_500"/>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:layout_gravity="end"
+                      android:layout_marginTop="16dp"
+                      android:layout_alignParentBottom="true"
+                      android:layout_alignParentEnd="true">
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/tv_loading_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cancel"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:textColor="@color/pms"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/tv_loading_submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/submit"
+                    android:textColor="@color/colorPrimary"
+                    style="?android:attr/borderlessButtonStyle"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</LinearLayout>
