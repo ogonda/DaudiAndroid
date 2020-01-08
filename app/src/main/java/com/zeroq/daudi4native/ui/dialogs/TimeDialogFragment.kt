@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.zeroq.daudi4native.R
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.ui.dialogs.data.TimeDialogEvent
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_time_dialog.*
 
-class TimeDialogFragment(var title: String, var truck: TruckModel) : DialogFragment() {
+class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragment() {
 
     private var _minutes: Int = 0
     private var _hours: Int = 0
@@ -44,7 +45,7 @@ class TimeDialogFragment(var title: String, var truck: TruckModel) : DialogFragm
     private fun viewInit() {
 
         tv_dialog_title.text = title
-        tv_truck_id.text = "Truck ${truck.truckId}"
+        tv_truck_id.text = "Truck ${order.QbConfig?.InvoiceId}"
 
 
         ib_up_hour.setOnClickListener {
@@ -89,7 +90,7 @@ class TimeDialogFragment(var title: String, var truck: TruckModel) : DialogFragm
                 timeEvent.onNext(
                     TimeDialogEvent(
                         (hourIntoMin + _minutes),
-                        truck
+                        order
                     )
                 )
                 dismiss()

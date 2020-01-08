@@ -40,7 +40,7 @@ class LoadingOrderViewModel @Inject constructor(
         }
 
         _truck = Transformations.switchMap(_combinedDepoTruckId, depotRepository::getTruck)
-        _depo = Transformations.switchMap(_depotId, depotRepository::getDepot)
+//        _depo = Transformations.switchMap(_depotId, depotRepository::getDepot)
 
         _userId.value = firebaseAuth.uid
     }

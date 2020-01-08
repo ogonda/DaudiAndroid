@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.QueuedTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
-import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.events.QueueingEvent
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
 import com.zeroq.daudi4native.utils.ActivityUtil
@@ -53,7 +53,7 @@ class QueuedFragment : BaseFragment() {
         queuedViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 val user = it.data()
-                queuedViewModel.setDepoId(user?.config?.depotid.toString())
+                queuedViewModel.setDepoId(user?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
             }
@@ -71,7 +71,7 @@ class QueuedFragment : BaseFragment() {
 
         if (event.error == null) {
 
-            if (event.trucks.isNullOrEmpty()) {
+            if (event.orders.isNullOrEmpty()) {
                 adapter.clear()
                 activityUtil.showTextViewState(
                     empty_view_q, true, "No trucks are in Queueing",
@@ -82,7 +82,7 @@ class QueuedFragment : BaseFragment() {
                 activityUtil.showTextViewState(
                     empty_view_q, false, null, null
                 )
-                adapter.replaceTrucks(event.trucks)
+                adapter.replaceTrucks(event.orders)
             }
         } else {
             adapter.clear()
@@ -118,13 +118,13 @@ class QueuedFragment : BaseFragment() {
         val expireClick =
             adapter.expireTvClick.observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    expireTimePicker(it.truck)
+                    expireTimePicker(it.order)
                 }
 
 
         val bodyClick = adapter.cardBodyClick.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                pushToLoadingDialog(it.truck)
+                pushToLoadingDialog(it.order)
             }
 
 
@@ -135,14 +135,14 @@ class QueuedFragment : BaseFragment() {
 
     var expireSub: Disposable? = null
 
-    private fun expireTimePicker(truck: TruckModel) {
+    private fun expireTimePicker(order: OrderModel) {
         expireSub?.dispose()
         expireSub = null
 
-        val expireDialog = TimeDialogFragment("Enter Additional Time", truck)
+        val expireDialog = TimeDialogFragment("Enter Additional Time", order)
         expireSub = expireDialog.timeEvent.subscribe { results ->
 
-            queuedViewModel.updateExpire(results.truck.Id!!, results.minutes.toLong())
+            queuedViewModel.updateExpire(results.order.Id!!, results.minutes.toLong())
                 .observe(this, Observer { state ->
                     if (!state.isSuccessful) {
                         Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
@@ -157,15 +157,15 @@ class QueuedFragment : BaseFragment() {
 
 
     var LoadingSub: Disposable? = null
-    private fun pushToLoadingDialog(truck: TruckModel) {
+    private fun pushToLoadingDialog(order: OrderModel) {
         LoadingSub?.dispose()
         LoadingSub = null
 
 
-        val toLoadingDialog = TimeDialogFragment("Enter Loading Time", truck)
+        val toLoadingDialog = TimeDialogFragment("Enter Loading Time", order)
         expireSub = toLoadingDialog.timeEvent.subscribe { results ->
 
-            queuedViewModel.pushToLoading(results.truck.Id!!, results.minutes.toLong())
+            queuedViewModel.pushToLoading(results.order.Id!!, results.minutes.toLong())
                 .observe(this, Observer { state ->
                     if (!state.isSuccessful) {
                         Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)

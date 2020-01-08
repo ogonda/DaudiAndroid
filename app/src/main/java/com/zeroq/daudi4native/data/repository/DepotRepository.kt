@@ -10,13 +10,11 @@ import com.google.firebase.firestore.Query
 import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.ui.dialogs.data.AverageDialogEvent
 import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
-import com.zeroq.daudi4native.utils.MyTimeUtils
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.DocumentLiveData
 import com.zeroq.daudi4native.vo.QueryLiveData
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.collections.ArrayList
@@ -51,8 +49,8 @@ class DepotRepository
     }
 
 
-    fun getDepot(depotId: String): DocumentLiveData<DepotModel> {
-        val depotRef = depots.document(depotId)
+    fun getDepot(user: UserModel): DocumentLiveData<DepotModel> {
+        val depotRef = depots.document(user.config?.app?.depotid!!)
 
         val data: DocumentLiveData<DepotModel> = DocumentLiveData(depotRef, DepotModel::class.java)
         depotRef.addSnapshotListener(data)
@@ -63,18 +61,18 @@ class DepotRepository
     /**
      * set processing expire
      * **/
-    fun updateProcessingExpire(depotId: String, truck: TruckModel, minutes: Long):
+    fun updateProcessingExpire(depotId: String, order: OrderModel, minutes: Long):
             CompletionLiveData {
 
         val completion = CompletionLiveData()
-        updateProcessingExpireTask(depotId, truck, minutes).addOnCompleteListener(completion)
+        updateProcessingExpireTask(depotId, order, minutes).addOnCompleteListener(completion)
         return completion
 
     }
 
     private fun updateProcessingExpireTask(
         depotId: String,
-        t: TruckModel,
+        t: OrderModel,
         minutes: Long
     ): Task<Void> {
         val truckRef = depots
@@ -87,7 +85,7 @@ class DepotRepository
             // add new time
             val startDate = Calendar.getInstance().time
 
-            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
             val calendar = Calendar.getInstance()
             calendar.time = startDate
@@ -98,7 +96,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, exTime, expireDate)
+            val expireObj = Expiry(startDate, expireDate)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["1"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -145,7 +143,7 @@ class DepotRepository
             .collection("trucks").document(idTruck)
 
         return firestore.runTransaction { transition ->
-            val truck: TruckModel? = transition.get(truckRef).toObject(TruckModel::class.java)
+//            val truck: TruckModel? = transition.get(truckRef).toObject(TruckModel::class.java)
 
             /*
             * driver details
@@ -195,8 +193,8 @@ class DepotRepository
                 // add new time
                 val startDate = Calendar.getInstance().time
 
-                val exTime: String =
-                    MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//                val exTime: String =
+//                    MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
                 val calendar = Calendar.getInstance()
                 calendar.time = startDate
@@ -205,7 +203,7 @@ class DepotRepository
                 val expireDate = calendar.time
 
 
-                val expireObj = Expiry(startDate, exTime, expireDate)
+                val expireObj = Expiry(startDate, expireDate)
                 val exp: ArrayList<Expiry> = ArrayList()
 
                 exp.add(expireObj)
@@ -258,7 +256,7 @@ class DepotRepository
 
 
             // time ellapse formart
-            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
             // time now
             val startDate = calendar.time
@@ -272,7 +270,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, exTime, expireDate)
+            val expireObj = Expiry(startDate, expireDate)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["2"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -315,7 +313,7 @@ class DepotRepository
             // add new time
             val startDate = Calendar.getInstance().time
 
-            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
             val calendar = Calendar.getInstance()
             calendar.time = startDate
@@ -326,7 +324,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, exTime, expireDate)
+            val expireObj = Expiry(startDate, expireDate)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["2"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -373,7 +371,7 @@ class DepotRepository
 
 
             // time ellapse formart
-            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
             // time now
             val startDate = calendar.time
@@ -387,7 +385,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, exTime, expireDate)
+            val expireObj = Expiry(startDate, expireDate)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["3"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -434,7 +432,7 @@ class DepotRepository
             // add new time
             val startDate = Calendar.getInstance().time
 
-            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
+//            val exTime: String = MyTimeUtils.formatElapsedTime(TimeUnit.MINUTES.toMillis(minutes))
 
             val calendar = Calendar.getInstance()
             calendar.time = startDate
@@ -445,7 +443,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, exTime, expireDate)
+            val expireObj = Expiry(startDate, expireDate)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["3"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -501,7 +499,7 @@ class DepotRepository
                 Triple("ik", truck?.fuel?.ik, loadingEvent.ikLoaded)
             )
 
-            truck?.fuel?.ago?.batches?.get("0")
+//            truck?.fuel?.ago?.batches?.get("0")
 
             val updateFuelBatch: ArrayList<Pair<String, Int>> = ArrayList()
 
@@ -578,15 +576,17 @@ class DepotRepository
     }
 
     private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
-        return if (fuel.batches?.get("1")?.qty!! > 0) {
-            fuel.batches?.get("1")?.observed = observed
 
-            fuel.batches?.get("1")?.Id!!
-        } else {
-            fuel.batches?.get("0")?.observed = observed
-
-            fuel.batches?.get("0")?.Id!!
-        }
+//        return if (fuel.batches?.get("1")?.qty!! > 0) {
+//            fuel.batches?.get("1")?.observed = observed
+//
+//            fuel.batches?.get("1")?.Id!!
+//        } else {
+//            fuel.batches?.get("0")?.observed = observed
+//
+//            fuel.batches?.get("0")?.Id!!
+//        }
+        return fuel.toString() + observed.toString()
     }
 
 
@@ -616,11 +616,11 @@ class DepotRepository
                 .collection("trucks").document(idTruck)
 
         return firestore.runTransaction { transaction ->
-            val truck: TruckModel? = transaction.get(truckRef).toObject(TruckModel::class.java)
+//            val truck: TruckModel? = transaction.get(truckRef).toObject(TruckModel::class.java)
 
             val sealsTemp: Seals = Seals(
                 sealRange,
-                ArrayList(brokenSeals?.split("-"))
+                ArrayList(brokenSeals.split("-"))
             )
 
             transaction.update(truckRef, "stagedata.4.data.seals", sealsTemp)

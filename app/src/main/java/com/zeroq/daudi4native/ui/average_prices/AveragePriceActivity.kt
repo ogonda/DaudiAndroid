@@ -64,7 +64,7 @@ class AveragePriceActivity : BaseActivity() {
             if (it.isSuccessful) {
                 userModel = it.data()
 
-                viewModel.setDeportId(userModel?.config?.depotid.toString())
+                viewModel.setDeportId(userModel?.config?.app?.depotid.toString())
             } else {
                 userModel = null
                 Timber.e(it.error())

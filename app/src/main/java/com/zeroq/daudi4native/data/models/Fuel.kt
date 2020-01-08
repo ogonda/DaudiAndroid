@@ -10,7 +10,11 @@ data class Fuel(
 
 data class Batches(
     var qty: Int?,
-    var batches: Map<String, Batch>?
+    var entries: List<TruckEntry>?
 ) {
     constructor() : this(0, null)
+}
+
+data class TruckEntry(var Name: String?, var Id: String?, var qty: Int?, var observed: Int?) {
+    constructor() : this(null, null, null, null)
 }

@@ -5,8 +5,6 @@ data class AdminConfig(
     var app: AppConfig?,
     var fcm: FcmObject?
 ) {
-    constructor() : this(null, null, null)
+    constructor()
+            : this(null, null, null)
 }
-
-
-

@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.zeroq.daudi4native.R
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.events.RecyclerTruckEvent
 import com.zeroq.daudi4native.utils.ActivityUtil
@@ -32,22 +33,22 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
     RecyclerView.Adapter<LoadingTrucksAdapter.TruckViewHolder>() {
 
 
-    private val trucksList = ArrayList<TruckModel>()
+    private val ordersList = ArrayList<OrderModel>()
     private lateinit var context: Context
 
     var expireTvClick = PublishSubject.create<RecyclerTruckEvent>()
     var cardBodyClick = PublishSubject.create<RecyclerTruckEvent>()
 
 
-    fun replaceTrucks(trucks: List<TruckModel>) {
-        if (trucksList.size > 0) trucksList.clear()
+    fun replaceTrucks(orders: List<OrderModel>) {
+        if (ordersList.size > 0) ordersList.clear()
 
-        trucksList.addAll(trucks)
+        ordersList.addAll(orders)
         this.notifyDataSetChanged()
     }
 
     fun clear() {
-        trucksList.clear()
+        ordersList.clear()
         this.notifyDataSetChanged()
     }
 
@@ -62,11 +63,11 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
         return TruckViewHolder(inflatedView)
     }
 
-    override fun getItemCount() = trucksList.size
+    override fun getItemCount() = ordersList.size
 
     override fun onBindViewHolder(holder: TruckViewHolder, position: Int) {
-        val truck = trucksList[position]
-        holder.bindPhoto(truck, context)
+        val order = ordersList[position]
+        holder.bindPhoto(order, context)
 
         if (holder.timerSubscription != null) {
             holder.timerSubscription?.dispose()
@@ -74,7 +75,7 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
         }
 
         // set timer
-        val stageTime = truck.stagedata!!["3"]?.data?.expiry!![0].timestamp!!.time
+        val stageTime = order.truckStageData!!["3"]?.expiry!![0].timeCreated!!.time
         val currentTime = Calendar.getInstance().time.time
 
         val diffTime = floor(stageTime.minus(currentTime).toDouble() / 1000).toLong()
@@ -111,28 +112,28 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
         /**
          * Times added
          * */
-        val timesAdded = truck.stagedata!!["3"]?.data?.expiry?.size.toString()
+        val timesAdded = order.truckStageData!!["3"]?.expiry?.size.toString()
         holder.timesTruckAddedView?.text = "Times Added [$timesAdded]"
 
 
         /**
          * trucks ahead
          * */
-        val trucksAhead: Int = trucksList.slice(0 until position).size
+        val trucksAhead: Int = ordersList.slice(0 until position).size
         holder.trucksAheadView?.text = "Trucks Ahead [$trucksAhead]"
 
         /**
          * expire click event
          * */
         holder.expireTruckIndicator?.setOnClickListener {
-            expireTvClick.onNext(RecyclerTruckEvent(position, truck))
+            expireTvClick.onNext(RecyclerTruckEvent(position, order))
         }
 
         /**
          * body click
          * */
         holder.cardBody?.setOnClickListener {
-            cardBodyClick.onNext(RecyclerTruckEvent(position, truck))
+            cardBodyClick.onNext(RecyclerTruckEvent(position, order))
         }
 
 
@@ -141,7 +142,7 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
          *  frozen, field
          * */
 
-        if (truck.frozen!!) {
+        if (order.frozen!!) {
             activityUtil.totalDisableViews(holder.parentLayout as ViewGroup)
         } else {
             activityUtil.enableViews(holder.parentLayout as ViewGroup)
@@ -257,18 +258,18 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
 
         }
 
-        fun bindPhoto(truck: TruckModel, context: Context) {
-            _orderNumber?.text = truck.truckId
-            numberPlate?.text = truck.numberplate
-            _companyName?.text = truck.company?.name
-            _driverName?.text = truck.drivername
-            _phoneNumber?.text = truck.company?.phone
+        fun bindPhoto(order: OrderModel, context: Context) {
+            _orderNumber?.text = order.QbConfig?.InvoiceId
+            numberPlate?.text = order.truck?.truckdetail?.numberplate
+            _companyName?.text = order.customer?.name
+            _driverName?.text = order.truck?.driverdetail?.name
+            _phoneNumber?.text = order.customer?.contact!![0].phone
 
-            _pmsTotal?.text = truck.fuel?.pms?.qty.toString()
-            _agoTotal?.text = truck.fuel?.ago?.qty.toString()
-            _ikTotal?.text = truck.fuel?.ik?.qty.toString()
+            _pmsTotal?.text = order.fuel?.pms?.qty.toString()
+            _agoTotal?.text = order.fuel?.ago?.qty.toString()
+            _ikTotal?.text = order.fuel?.ik?.qty.toString()
 
-            truck.compartments?.forEachIndexed { index, compartment ->
+            order.truck?.compartments?.forEachIndexed { index, compartment ->
                 setCompValues(index, compartment.fueltype, compartment.qty, context)
             }
 

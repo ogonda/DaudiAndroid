@@ -31,6 +31,7 @@ import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.broadcasts.TruckExpireBroadCast
 import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.DepotModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.events.LoadingEvent
 import com.zeroq.daudi4native.events.ProcessingEvent
@@ -198,8 +199,10 @@ class MainActivity : BaseActivity() {
 
         mainViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
-                val userData = it.data()
-                mainViewModel.setDeportId(userData?.config?.depotid.toString())
+                it.data()?.let { u ->
+                    mainViewModel.setSwitchUser(u)
+                }
+
             } else {
                 Timber.e(it.error())
             }
@@ -219,24 +222,24 @@ class MainActivity : BaseActivity() {
         })
 
         // get update
-        mainViewModel.getTrucks().observe(this, Observer {
+        mainViewModel.getOrders().observe(this, Observer {
             if (it.isSuccessful) {
-                val processingL = ArrayList<TruckModel>()
-                val loadingL = ArrayList<TruckModel>()
-                val queueingL = ArrayList<TruckModel>()
+                val processingL = ArrayList<OrderModel>()
+                val loadingL = ArrayList<OrderModel>()
+                val queueingL = ArrayList<OrderModel>()
 
-                it.data()?.forEach { truckModel ->
-                    when (truckModel.stage) {
+                it.data()?.forEach { order ->
+                    when (order.truck?.stage) {
                         1 -> {
-                            processingL.add(truckModel)
+                            processingL.add(order)
                         }
 
                         2 -> {
-                            queueingL.add(truckModel)
+                            queueingL.add(order)
                         }
 
                         3 -> {
-                            loadingL.add(truckModel)
+                            loadingL.add(order)
                         }
                     }
                 }
@@ -244,19 +247,19 @@ class MainActivity : BaseActivity() {
                 addReminder(it.data()!!)
 
                 val sortedProcessing =
-                    processingL.sortedBy { truck ->
-                        sortStage(truck, "1")
+                    processingL.sortedBy { order ->
+                        sortStage(order, "1")
                     }
 
 
                 val sortedQueueing =
-                    queueingL.sortedBy { truck ->
-                        sortStage(truck, "2")
+                    queueingL.sortedBy { order ->
+                        sortStage(order, "2")
                     }
 
                 val sortedLoading =
-                    loadingL.sortedBy { truck ->
-                        sortStage(truck, "3")
+                    loadingL.sortedBy { order ->
+                        sortStage(order, "3")
                     }
 
 
@@ -297,9 +300,9 @@ class MainActivity : BaseActivity() {
         authUI.signOut(this)
     }
 
-    private fun sortStage(truck1: TruckModel, stage: String): Long {
-        val exLength = truck1.stagedata!![stage]?.data?.expiry?.size!!.minus(1)
-        return truck1.stagedata!![stage]?.data?.expiry!![exLength].timestamp!!.time
+    private fun sortStage(order: OrderModel, stage: String): Long {
+        val exLength = order.truckStageData!![stage]?.expiry?.size!!.minus(1)
+        return order.truckStageData!![stage]?.expiry!![exLength].timeCreated!!.time
     }
 
 
@@ -331,17 +334,17 @@ class MainActivity : BaseActivity() {
     }
 
 
-    private fun addReminder(trucks: List<TruckModel>) {
+    private fun addReminder(orders: List<OrderModel>) {
         // cancel the existing alarms
 
-        trucks.forEach { truck ->
+        orders.forEach { order ->
 
-            val requestCode = utils.stripNonDigits(truck.truckId!!)
-
-
+            val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
 
 
-            if (truck.stage == 4) {
+
+
+            if (order.truck?.stage == 4) {
                 /**
                  * cancel the alarm that are not interested by it alarm
                  * TODO: cancel when exiting this here is just useless
@@ -355,20 +358,23 @@ class MainActivity : BaseActivity() {
             }
 
 
-            val stagePair = when (truck.stage) {
+            val stagePair = when (order.truck?.stage) {
                 1 ->
-                    Pair("Processing", truck.stagedata?.get("1")?.data?.expiry?.get(0)?.timestamp!!)
+                    Pair(
+                        "Processing",
+                        order.truckStageData?.get("1")?.expiry?.get(0)?.timeCreated!!
+                    )
                 2 ->
-                    Pair("Queued", truck.stagedata?.get("2")?.data?.expiry?.get(0)?.timestamp!!)
+                    Pair("Queued", order.truckStageData?.get("2")?.expiry?.get(0)?.timeCreated!!)
 
                 3 ->
 
-                    Pair("Loading", truck.stagedata?.get("3")?.data?.expiry?.get(0)?.timestamp!!)
+                    Pair("Loading", order.truckStageData?.get("3")?.expiry?.get(0)?.timeCreated!!)
                 else ->
                     Pair("Unknow", Date())
             }
 
-            val title = "Truck ${truck.truckId}"
+            val title = "Truck ${order.QbConfig?.InvoiceId}"
             val content = "In ${stagePair.first} has expired"
 
             // time difference and then get hours min and sec
