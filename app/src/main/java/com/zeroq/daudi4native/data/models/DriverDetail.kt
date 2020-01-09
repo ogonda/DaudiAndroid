@@ -1,5 +1,5 @@
 package com.zeroq.daudi4native.data.models
 
-data class QbConfig(var QbId: String?, var companyid: String?, var sandbox: String?) {
+data class DriverDetail(var name: String?, var id: String?, var phone: String?) {
     constructor() : this(null, null, null)
 }

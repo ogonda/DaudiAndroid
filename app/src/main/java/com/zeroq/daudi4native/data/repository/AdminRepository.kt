@@ -23,7 +23,7 @@ constructor(@Named("admins") val admins: CollectionReference) {
         val adminRef = admins.document(adminId)
         val completion = CompletionLiveData()
 
-        adminRef.update("fcmtokens.apk", token)
+        adminRef.update("config.fcm.tokens.apk", token)
             .addOnCompleteListener(completion)
 
         return completion

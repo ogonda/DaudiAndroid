@@ -72,10 +72,18 @@ class LoginActivity : BaseActivity() {
 
             when (it.status) {
                 Status.SUCCESS ->
-                    Snackbar.make(main_layout, "Logged in successfully", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(
+                        main_layout,
+                        "Logged in successfully",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
 
-                Status.ERROR ->
-                    Snackbar.make(main_layout, "Sorry an error occured, try again", Snackbar.LENGTH_SHORT).show()
+                else ->
+                    Snackbar.make(
+                        main_layout,
+                        "Sorry an error occured, try again",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
             }
         })
 

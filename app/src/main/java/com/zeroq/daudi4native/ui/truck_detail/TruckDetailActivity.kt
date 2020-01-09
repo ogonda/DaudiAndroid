@@ -108,7 +108,7 @@ class TruckDetailActivity : BaseActivity() {
         truckDetailViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 _user = it.data()!!
-                truckDetailViewModel.setDepotId(_user.config?.depotid.toString())
+                truckDetailViewModel.setDepotId(_user.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
             }
@@ -206,7 +206,7 @@ class TruckDetailActivity : BaseActivity() {
 
 
         val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.depotid}&T=${truck.truckId}"
+            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${truck.truckId}"
 
         val dimensions = imageUtil.dpToPx(this, 150)
 
@@ -353,13 +353,14 @@ class TruckDetailActivity : BaseActivity() {
 
 
     private fun getBatchName(batches: Batches): String? {
-        val temp = if (batches.batches!!["1"]?.qty != 0) {
-            batches.batches!!["1"]?.Name
-        } else {
-            batches.batches!!["0"]?.Name
-        }
-
-        return temp ?: "****************"
+//        val temp = if (batches.batches!!["1"]?.qty != 0) {
+//            batches.batches!!["1"]?.Name
+//        } else {
+//            batches.batches!!["0"]?.Name
+//        }
+//
+//        return temp ?: "****************"
+        return batches.toString()
     }
 
 
@@ -469,11 +470,12 @@ class TruckDetailActivity : BaseActivity() {
 
             when (btnValue) {
                 "EMPTY" ->
-                    compList.add(Compartment(null, null))
+                    compList.add(Compartment(index, null, null))
 
                 else ->
                     compList.add(
                         Compartment(
+                            index,
                             btnValue.toLowerCase(),
                             viewComp[index].text.toString().toInt()
                         )
@@ -486,7 +488,7 @@ class TruckDetailActivity : BaseActivity() {
         val numberPlate = et_driver_plate.text.toString().toUpperCase()
 
         truckDetailViewModel.updateTruckComAndDriver(
-            _user.config?.depotid.toString(), DepotTruck?.Id!!,
+            _user.config?.app?.depotid.toString(), DepotTruck?.Id!!,
             compList, driverId, driverName, numberPlate
         ).observe(this, Observer {
 
@@ -533,7 +535,7 @@ class TruckDetailActivity : BaseActivity() {
 
                     PrintingActivity.startPrintingActivity(
                         this,
-                        _user.config?.depotid.toString(), DepotTruck?.Id!!,
+                        _user.config?.app?.depotid.toString(), DepotTruck?.Id!!,
                         "1",
                         DepotTruck?.config?.sandbox!!
                     )

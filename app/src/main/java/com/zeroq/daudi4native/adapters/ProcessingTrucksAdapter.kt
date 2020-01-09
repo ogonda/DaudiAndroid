@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.zeroq.daudi4native.R
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.events.RecyclerTruckEvent
 import com.zeroq.daudi4native.utils.ActivityUtil
@@ -32,7 +33,7 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
     RecyclerView.Adapter<ProcessingTrucksAdapter.TruckViewHolder>() {
 
 
-    private val trucksList = ArrayList<TruckModel>()
+    private val orderList = ArrayList<OrderModel>()
     private lateinit var context: Context
 
 
@@ -44,15 +45,15 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
     var cardBodyLongClick = PublishSubject.create<RecyclerTruckEvent>()
 
 
-    fun replaceTrucks(trucks: List<TruckModel>) {
-        if (trucksList.size > 0) trucksList.clear()
+    fun replaceTrucks(orders: List<OrderModel>) {
+        if (orderList.size > 0) orderList.clear()
 
-        trucksList.addAll(trucks)
+        orderList.addAll(orders)
         this.notifyDataSetChanged()
     }
 
     fun clear() {
-        trucksList.clear()
+        orderList.clear()
         this.notifyDataSetChanged()
     }
 
@@ -69,12 +70,12 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
         return TruckViewHolder(inflatedView)
     }
 
-    override fun getItemCount() = trucksList.size
+    override fun getItemCount() = orderList.size
 
     override fun onBindViewHolder(holder: TruckViewHolder, position: Int) {
-        val truck = trucksList[position]
+        val order = orderList[position]
 
-        holder.bindPhoto(truck, context)
+        holder.bindPhoto(order, context)
 
         if (holder.timerSubscription != null) {
             holder.timerSubscription?.dispose()
@@ -82,7 +83,7 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
         }
 
         // set timer
-        val stageTime = truck.stagedata!!["1"]?.data?.expiry!![0].timestamp!!.time
+        val stageTime = order.truckStageData!!["1"]?.expiry!![0].timeCreated!!.time
         val currentTime = Calendar.getInstance().time.time
 
         val diffTime = floor(stageTime.minus(currentTime).toDouble() / 1000).toLong()
@@ -119,7 +120,7 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
         /**
          * Times added
          * */
-        val timesAdded = truck.stagedata!!["1"]?.data?.expiry?.size.toString()
+        val timesAdded = order.truckStageData!!["1"]?.expiry?.size.toString()
         holder.timesTruckAddedView?.text = "Times Added [$timesAdded]"
 
 
@@ -127,7 +128,7 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
          * trucks ahead
          * */
 
-        val trucksAhead: Int = trucksList.slice(0 until position).size
+        val trucksAhead: Int = orderList.slice(0 until position).size
         holder.trucksAheadView?.text = "Trucks Ahead [$trucksAhead]"
 
 
@@ -135,21 +136,21 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
          * expire click event
          * */
         holder.expireTruckIndicator?.setOnClickListener {
-            expireTvClick.onNext(RecyclerTruckEvent(position, truck))
+            expireTvClick.onNext(RecyclerTruckEvent(position, order))
         }
 
         /**
          * body click
          * */
         holder.cardBody?.setOnClickListener {
-            cardBodyClick.onNext(RecyclerTruckEvent(position, truck))
+            cardBodyClick.onNext(RecyclerTruckEvent(position, order))
         }
 
         /**
          * body longclick
          * */
         holder.cardBody?.setOnLongClickListener {
-            cardBodyLongClick.onNext(RecyclerTruckEvent(position, truck))
+            cardBodyLongClick.onNext(RecyclerTruckEvent(position, order))
             return@setOnLongClickListener true
         }
 
@@ -158,7 +159,7 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
          *  frozen, field
          * */
 
-        if (truck.frozen!!) {
+        if (order.frozen!!) {
             activityUtil.totalDisableViews(holder.parentLayout as ViewGroup)
         } else {
             activityUtil.enableViews(holder.parentLayout as ViewGroup)
@@ -275,25 +276,25 @@ class ProcessingTrucksAdapter(var activityUtil: ActivityUtil) :
 
         }
 
-        fun bindPhoto(truck: TruckModel, context: Context) {
-            _orderNumber?.text = truck.truckId
-            numberPlate?.text = truck.numberplate
-            _companyName?.text = truck.company?.name
-            _driverName?.text = truck.drivername
-            _phoneNumber?.text = truck.company?.phone
+        fun bindPhoto(order: OrderModel, context: Context) {
+            _orderNumber?.text = order.QbConfig?.InvoiceId
+            numberPlate?.text = order.truck?.truckdetail?.numberplate
+            _companyName?.text = order.customer?.name
+            _driverName?.text = order.truck?.driverdetail?.name
+            _phoneNumber?.text = order.customer?.contact!![0].phone
 
-            _pmsTotal?.text = truck.fuel?.pms?.qty.toString()
-            _agoTotal?.text = truck.fuel?.ago?.qty.toString()
-            _ikTotal?.text = truck.fuel?.ik?.qty.toString()
+            _pmsTotal?.text = order.fuel?.pms?.qty.toString()
+            _agoTotal?.text = order.fuel?.ago?.qty.toString()
+            _ikTotal?.text = order.fuel?.ik?.qty.toString()
 
-            truck.compartments?.forEachIndexed { index, compartment ->
-                setCompValues(index, compartment.fueltype, compartment.qty, context, truck.frozen!!)
+            order.truck?.compartments?.forEachIndexed { index, compartment ->
+                setCompValues(index, compartment.fueltype, compartment.qty, context)
             }
         }
 
         private fun setCompValues(
             index: Int, fuelType: String?, quantity: Int?,
-            context: Context, frozen: Boolean
+            context: Context
         ) {
             when (fuelType) {
                 "pms" -> {

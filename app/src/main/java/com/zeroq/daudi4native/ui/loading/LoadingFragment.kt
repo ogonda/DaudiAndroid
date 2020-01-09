@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.LoadingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
-import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.events.LoadingEvent
 import com.zeroq.daudi4native.ui.dialogs.LoadingDialogFragment
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
@@ -57,7 +57,7 @@ class LoadingFragment : BaseFragment() {
         viewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 val user = it.data()
-                viewModel.setDepoId(user?.config?.depotid.toString())
+                viewModel.setDepoId(user?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
             }
@@ -82,7 +82,7 @@ class LoadingFragment : BaseFragment() {
 
         if (event.error == null) {
 
-            if (event.trucks.isNullOrEmpty()) {
+            if (event.orders.isNullOrEmpty()) {
                 adapter.clear()
 
                 activityUtil.showTextViewState(
@@ -93,7 +93,7 @@ class LoadingFragment : BaseFragment() {
                 activityUtil.showTextViewState(
                     empty_view_l, false, null, null
                 )
-                adapter.replaceTrucks(event.trucks)
+                adapter.replaceTrucks(event.orders)
             }
         } else {
             adapter.clear()
@@ -131,13 +131,13 @@ class LoadingFragment : BaseFragment() {
         val clickSub: Disposable = adapter.expireTvClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                expireTimePicker(it.truck)
+                expireTimePicker(it.order)
             }
 
 
         val cardBodyClick: Disposable = adapter.cardBodyClick
             .subscribe {
-                sealForm(it.truck)
+                sealForm(it.order)
             }
 
         compositeDisposable.add(clickSub)
@@ -145,13 +145,13 @@ class LoadingFragment : BaseFragment() {
     }
 
     var expireSub: Disposable? = null
-    private fun expireTimePicker(truck: TruckModel) {
+    private fun expireTimePicker(order: OrderModel) {
         expireSub?.dispose()
         expireSub = null
 
-        val expireDialog = TimeDialogFragment("Enter Additional Time", truck)
+        val expireDialog = TimeDialogFragment("Enter Additional Time", order)
         expireSub = expireDialog.timeEvent.subscribe {
-            viewModel.updateExpire(it.truck.Id!!, it.minutes.toLong())
+            viewModel.updateExpire(it.order.Id!!, it.minutes.toLong())
                 .observe(this, Observer { result ->
                     if (!result.isSuccessful) {
                         Toast.makeText(
@@ -168,21 +168,21 @@ class LoadingFragment : BaseFragment() {
     }
 
     var sealSub: Disposable? = null
-    private fun sealForm(truck: TruckModel) {
+    private fun sealForm(order: OrderModel) {
         sealSub?.dispose()
         sealSub = null
 
 
-        if (truck.stagedata?.get("4")?.data == null) {
-            val sealDialog = LoadingDialogFragment(truck)
+        if (order.truckStageData?.get("4") == null) {
+            val sealDialog = LoadingDialogFragment(order)
             sealSub = sealDialog.loadingEvent.subscribe {
                 sealDialog.dismiss() // hide dialog
                 progressDialog.show() // show dialog
 
-                viewModel.updateSeals(truck.Id!!, it).observe(this, Observer { result ->
+                viewModel.updateSeals(order.Id!!, it).observe(this, Observer { result ->
                     if (result.isSuccessful) {
                         progressDialog.hide() // hide progress
-                        startLoadingOrderActivity(truck.Id!!)
+                        startLoadingOrderActivity(order.Id!!)
                     } else {
                         progressDialog.hide() // hide progress
                         Toast.makeText(
@@ -198,7 +198,7 @@ class LoadingFragment : BaseFragment() {
 
             sealDialog.show(fragmentManager!!, _TAG)
         } else {
-            startLoadingOrderActivity(truck.Id!!)
+            startLoadingOrderActivity(order.Id!!)
         }
     }
 

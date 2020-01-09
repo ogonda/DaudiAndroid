@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.ProcessingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
-import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.events.ProcessingEvent
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
 import com.zeroq.daudi4native.ui.truck_detail.TruckDetailActivity
@@ -60,7 +60,7 @@ class ProcessingFragment : BaseFragment() {
         processingViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 val user = it.data()
-                processingViewModel.setDepoId(user?.config?.depotid.toString())
+                processingViewModel.setDepoId(user?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
             }
@@ -81,7 +81,7 @@ class ProcessingFragment : BaseFragment() {
 
         if (event.error == null) {
 
-            if (event.trucks.isNullOrEmpty()) {
+            if (event.orders.isNullOrEmpty()) {
                 adapter.clear()
                 activityUtil.showTextViewState(
                     empty_view, true, "No trucks are in Processing",
@@ -91,7 +91,7 @@ class ProcessingFragment : BaseFragment() {
                 activityUtil.showTextViewState(
                     empty_view, false, null, null
                 )
-                adapter.replaceTrucks(event.trucks)
+                adapter.replaceTrucks(event.orders)
             }
         } else {
             adapter.clear()
@@ -114,26 +114,26 @@ class ProcessingFragment : BaseFragment() {
         val clickSub: Disposable = adapter.expireTvClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                expireTimePicker(it.truck)
+                expireTimePicker(it.order)
             }
 
 
         val cardBodyClick: Disposable = adapter.cardBodyClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                val printed = it?.truck?.isPrinted
+                val printed = it?.order?.printStatus?.LoadingOrder?.status
 
                 if (printed!!) {
-                    queueTruckDialog(it.truck)
+                    queueTruckDialog(it.order)
                 } else {
-                    startTruckDetailActivity(it.truck.Id)
+                    startTruckDetailActivity(it.order.Id)
                 }
             }
 
         val longCardPress: Disposable = adapter.cardBodyLongClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                startTruckDetailActivity(it.truck.Id)
+                startTruckDetailActivity(it.order.Id)
             }
 
         compositeDisposable.add(clickSub)
@@ -144,13 +144,13 @@ class ProcessingFragment : BaseFragment() {
 
     var expireSub: Disposable? = null
 
-    private fun expireTimePicker(truck: TruckModel) {
+    private fun expireTimePicker(order: OrderModel) {
         expireSub?.dispose()
         expireSub = null
 
-        val expireDialog = TimeDialogFragment("Enter Additional Time", truck)
+        val expireDialog = TimeDialogFragment("Enter Additional Time", order)
         expireSub = expireDialog.timeEvent.subscribe {
-            processingViewModel.updateExpire(truck, it.minutes.toLong())
+            processingViewModel.updateExpire(order, it.minutes.toLong())
                 .observe(this, Observer { state ->
                     if (!state.isSuccessful) {
                         Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
@@ -165,13 +165,13 @@ class ProcessingFragment : BaseFragment() {
 
 
     var queueSub: Disposable? = null
-    private fun queueTruckDialog(truck: TruckModel) {
+    private fun queueTruckDialog(order: OrderModel) {
         queueSub?.dispose()
         queueSub = null
 
-        val queueDialog = TimeDialogFragment("Enter Queueing Time", truck)
+        val queueDialog = TimeDialogFragment("Enter Queueing Time", order)
         queueSub = queueDialog.timeEvent.subscribe {
-            processingViewModel.moveToQueuing(it.truck.Id!!, it.minutes.toLong())
+            processingViewModel.moveToQueuing(it.order.Id!!, it.minutes.toLong())
                 .observe(this, Observer { result ->
                     if (result.isSuccessful) {
                         Toast.makeText(activity, "Truck moved to processing", Toast.LENGTH_SHORT)

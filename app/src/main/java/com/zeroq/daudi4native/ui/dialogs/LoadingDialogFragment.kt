@@ -10,18 +10,22 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.zeroq.daudi4native.R
-import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_loading_dialog.*
 import kotlin.math.abs
 
-class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
+class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
     var loadingEvent =
         PublishSubject.create<LoadingDialogEvent>()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(
             R.layout.fragment_loading_dialog,
             container,
@@ -47,7 +51,7 @@ class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
     lateinit var belowViews: List<EditText>
 
     private fun viewInit() {
-        tv_loading_truck_id.text = "Truck ${truck.truckId}"
+        tv_loading_truck_id.text = "Truck ${order.QbConfig?.InvoiceId}"
 
         /**
          * cancel dialog
@@ -57,8 +61,8 @@ class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
         }
 
         actuals = listOf(
-            Pair(et_pms_actual, truck.fuel?.pms?.qty!!),
-            Pair(et_ago_actual, truck.fuel?.ago?.qty!!), Pair(et_ik_actual, truck.fuel?.ik?.qty!!)
+            Pair(et_pms_actual, order.fuel?.pms?.qty!!),
+            Pair(et_ago_actual, order.fuel?.ago?.qty!!), Pair(et_ik_actual, order.fuel?.ik?.qty!!)
         )
 
         /**
@@ -90,9 +94,20 @@ class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
                         }
                     }
 
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                         if (!s.isNullOrEmpty()) {
                             val minActual = abs(allowedActual * it.second).toInt()
                             val providedActual = s.toString().toInt()
@@ -122,9 +137,20 @@ class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
 
                     }
 
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                         if (s.isNullOrEmpty()) {
                             editText.error = "This field can't be empty"
                         }
@@ -156,7 +182,7 @@ class LoadingDialogFragment(var truck: TruckModel) : DialogFragment() {
          * */
         var hasErrors = false
 
-        actuals.forEachIndexed { index, pair ->
+        actuals.forEach { pair ->
             if (pair.second > 0) {
                 if (pair.first.text.isNullOrEmpty() || pair.first.error != null) {
                     hasErrors = true

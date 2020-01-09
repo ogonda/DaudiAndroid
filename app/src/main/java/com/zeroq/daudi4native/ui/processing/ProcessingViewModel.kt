@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
@@ -40,8 +41,8 @@ class ProcessingViewModel @Inject constructor(
         if (depotid != _depotId.value) _depotId.value = depotid
     }
 
-    fun updateExpire(truck: TruckModel, minutes: Long): CompletionLiveData {
-        return depotRepository.updateProcessingExpire(_depotId.value!!, truck, minutes)
+    fun updateExpire(order: OrderModel, minutes: Long): CompletionLiveData {
+        return depotRepository.updateProcessingExpire(_depotId.value!!, order, minutes)
     }
 
     fun moveToQueuing(

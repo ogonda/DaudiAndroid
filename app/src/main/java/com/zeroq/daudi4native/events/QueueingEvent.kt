@@ -1,5 +1,5 @@
 package com.zeroq.daudi4native.events
 
-import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.data.models.OrderModel
 
-class QueueingEvent(val trucks: List<TruckModel>?, val error: Exception?)
+class QueueingEvent(val orders: List<OrderModel>?, val error: Exception?)
