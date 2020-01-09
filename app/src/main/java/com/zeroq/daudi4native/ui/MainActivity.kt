@@ -229,6 +229,7 @@ class MainActivity : BaseActivity() {
                 val queueingL = ArrayList<OrderModel>()
 
                 it.data()?.forEach { order ->
+
                     when (order.truck?.stage) {
                         1 -> {
                             processingL.add(order)

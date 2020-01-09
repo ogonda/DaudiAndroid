@@ -79,6 +79,8 @@ class ProcessingFragment : BaseFragment() {
 
         activityUtil.showProgress(spin_kit, false)
 
+        Timber.e(event.error)
+
         if (event.error == null) {
 
             if (event.orders.isNullOrEmpty()) {

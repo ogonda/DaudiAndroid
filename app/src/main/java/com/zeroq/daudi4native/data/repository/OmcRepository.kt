@@ -25,7 +25,7 @@ class OmcRepository @Inject constructor(
      * from stage 1 t0 3
     */
     fun getOrders(user: UserModel): QueryLiveData<OrderModel> {
-        return QueryLiveData(ordersQuery(user), OrderModel::class.java);
+        return QueryLiveData(ordersQuery(user), OrderModel::class.java)
     }
 
 
@@ -34,8 +34,8 @@ class OmcRepository @Inject constructor(
             .document(user.config?.omcId!!)
             .collection("orders")
             .whereEqualTo("config.depot.id", user.config?.app?.depotid!!)
-            .whereGreaterThan("stage", 0)
-            .whereLessThan("stage", 4)
+            .whereGreaterThan("truck.stage", 0)
+            .whereLessThan("truck.stage", 4)
     }
 
 
