@@ -1,14 +1,12 @@
 package com.zeroq.daudi4native.data.repository
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
-import com.zeroq.daudi4native.data.models.Expiry
-import com.zeroq.daudi4native.data.models.OmcModel
-import com.zeroq.daudi4native.data.models.OrderModel
-import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.QueryLiveData
 import java.util.*
@@ -17,8 +15,9 @@ import javax.inject.Named
 
 class OmcRepository @Inject constructor(
     @Named("omc") val omc: CollectionReference,
-    val firestore: FirebaseFirestore
-) {
+    val firestore: FirebaseFirestore,
+    var firebaseAuth: FirebaseAuth
+    ) {
 
 
     fun getAllOmcs(): QueryLiveData<OmcModel> {
@@ -64,6 +63,7 @@ class OmcRepository @Inject constructor(
         minutes: Long
     ): Task<Void> {
 
+
         /*
         * omc id will be from the user config for more security
         * */
@@ -94,6 +94,14 @@ class OmcRepository @Inject constructor(
 
             // commit to fireStore
             transaction.update(orderRef, "truckStageData.1.expiry", exp)
+
+
+            firebaseAuth.currentUser?.let {
+                val printedBy = AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                // commit current user
+                transaction.update(orderRef, "truckStageData.1.user", printedBy)
+            }
 
             return@runTransaction null
         }

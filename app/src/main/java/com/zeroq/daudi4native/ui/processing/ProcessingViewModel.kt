@@ -43,10 +43,6 @@ class ProcessingViewModel @Inject constructor(
         if (depotid != _depotId.value) _depotId.value = depotid
     }
 
-    fun updateExpire(order: OrderModel, minutes: Long): CompletionLiveData {
-        return depotRepository.updateProcessingExpire(_depotId.value!!, order, minutes)
-    }
-
     fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
         return omcRepository.updateProcessingExpire(user, order, minutes)
     }
