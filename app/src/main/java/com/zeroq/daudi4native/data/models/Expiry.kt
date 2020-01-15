@@ -1,16 +1,5 @@
 package com.zeroq.daudi4native.data.models
-
-import com.google.firebase.Timestamp
 import java.util.*
-
-//data class Expiry(
-//    var startTime: Any?,
-//    var time: String?,
-//    var timestamp: Date?
-//) {
-//    constructor() : this(null, null, null)
-//}
-
 
 
 data class Expiry(

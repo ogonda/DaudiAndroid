@@ -131,7 +131,7 @@ class TruckDetailActivity : BaseActivity() {
                 DepotTruck = it.data()
                 initialTruckValues(it.data()!!)
             } else {
-                Timber.e(it.error()!!)
+                Timber.e(it.error())
             }
         })
 
