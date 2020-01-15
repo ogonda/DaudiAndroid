@@ -229,6 +229,7 @@ class MainActivity : BaseActivity() {
                 val queueingL = ArrayList<OrderModel>()
 
                 it.data()?.forEach { order ->
+
                     when (order.truck?.stage) {
                         1 -> {
                             processingL.add(order)
@@ -339,7 +340,9 @@ class MainActivity : BaseActivity() {
 
         orders.forEach { order ->
 
-            val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
+            // TODO: error here sir, set reminder better
+            //  val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
+            val requestCode = 200
 
 
 

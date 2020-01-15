@@ -75,7 +75,7 @@ class LoadingTrucksAdapter(var activityUtil: ActivityUtil) :
         }
 
         // set timer
-        val stageTime = order.truckStageData!!["3"]?.expiry!![0].timeCreated!!.time
+        val stageTime = order.truckStageData!!["3"]?.expiry!![0].timeCreated!!.seconds
         val currentTime = Calendar.getInstance().time.time
 
         val diffTime = floor(stageTime.minus(currentTime).toDouble() / 1000).toLong()

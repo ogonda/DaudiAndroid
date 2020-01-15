@@ -15,6 +15,7 @@ import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.ProcessingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
 import com.zeroq.daudi4native.data.models.OrderModel
+import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.events.ProcessingEvent
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
 import com.zeroq.daudi4native.ui.truck_detail.TruckDetailActivity
@@ -44,6 +45,8 @@ class ProcessingFragment : BaseFragment() {
 
     private lateinit var processingViewModel: ProcessingViewModel
 
+    private var user: UserModel? = null;
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +62,7 @@ class ProcessingFragment : BaseFragment() {
 
         processingViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
-                val user = it.data()
+                user = it.data()
                 processingViewModel.setDepoId(user?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
@@ -78,6 +81,8 @@ class ProcessingFragment : BaseFragment() {
     fun onMessageEvent(event: ProcessingEvent) {
 
         activityUtil.showProgress(spin_kit, false)
+
+        Timber.e(event.error)
 
         if (event.error == null) {
 
@@ -111,6 +116,8 @@ class ProcessingFragment : BaseFragment() {
     }
 
     private fun consumeEvents() {
+
+        // add expire - data
         val clickSub: Disposable = adapter.expireTvClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -150,14 +157,16 @@ class ProcessingFragment : BaseFragment() {
 
         val expireDialog = TimeDialogFragment("Enter Additional Time", order)
         expireSub = expireDialog.timeEvent.subscribe {
-            processingViewModel.updateExpire(order, it.minutes.toLong())
-                .observe(this, Observer { state ->
-                    if (!state.isSuccessful) {
-                        Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
-                            .show()
-                        Timber.e(state.error())
-                    }
-                })
+            user?.let { u ->
+                processingViewModel.updateExpire(u, order, it.minutes.toLong())
+                    .observe(this, Observer { state ->
+                        if (!state.isSuccessful) {
+                            Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
+                                .show()
+                            Timber.e(state.error())
+                        }
+                    })
+            }
         }
 
         expireDialog.show(fragmentManager!!, _TAG)
