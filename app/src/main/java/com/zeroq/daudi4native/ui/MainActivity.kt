@@ -340,7 +340,9 @@ class MainActivity : BaseActivity() {
 
         orders.forEach { order ->
 
-            val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
+            // TODO: error here sir, set reminder better
+//            val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
+            val requestCode = 200;
 
 
 
