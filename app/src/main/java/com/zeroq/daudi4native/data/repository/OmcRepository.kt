@@ -8,6 +8,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
 import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.vo.CompletionLiveData
+import com.zeroq.daudi4native.vo.DocumentLiveData
 import com.zeroq.daudi4native.vo.QueryLiveData
 import java.util.*
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class OmcRepository @Inject constructor(
     @Named("omc") val omc: CollectionReference,
     val firestore: FirebaseFirestore,
     var firebaseAuth: FirebaseAuth
-    ) {
+) {
 
 
     fun getAllOmcs(): QueryLiveData<OmcModel> {
@@ -32,6 +33,19 @@ class OmcRepository @Inject constructor(
         return QueryLiveData(ordersQuery(user), OrderModel::class.java)
     }
 
+    fun getOrder(combinedUserOrderId: Pair<UserModel, String>): DocumentLiveData<OrderModel> {
+        val user: UserModel = combinedUserOrderId.first
+        val orderId: String = combinedUserOrderId.second
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        val data: DocumentLiveData<OrderModel> = DocumentLiveData(orderRef, OrderModel::class.java)
+        orderRef.addSnapshotListener(data)
+
+        return data
+    }
 
     private fun ordersQuery(user: UserModel): Query {
         return omc

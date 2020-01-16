@@ -125,12 +125,15 @@ class ProcessingFragment : BaseFragment() {
             }
 
 
+        // what happens when the card body is clicked
         val cardBodyClick: Disposable = adapter.cardBodyClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 val printed = it?.order?.printStatus?.LoadingOrder?.status
 
-                if (printed!!) {
+                Timber.d("" + printed)
+
+                if (printed != null || printed == true) {
                     queueTruckDialog(it.order)
                 } else {
                     startTruckDetailActivity(it.order.Id)
