@@ -23,10 +23,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
-import com.zeroq.daudi4native.data.models.Batches
-import com.zeroq.daudi4native.data.models.Compartment
-import com.zeroq.daudi4native.data.models.TruckModel
-import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
 import com.zeroq.daudi4native.utils.ImageUtil
@@ -75,7 +72,8 @@ class TruckDetailActivity : BaseActivity() {
     private lateinit var _topInputs: List<EditText>
 
     private lateinit var _user: UserModel
-    private var DepotTruck: TruckModel? = null
+   // private var DepotTruck: TruckModel? = null
+    private var depotOrder: OrderModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,11 +101,12 @@ class TruckDetailActivity : BaseActivity() {
         * set  the viewModel
         * */
         truckDetailViewModel = getViewModel(TruckDetailViewModel::class.java)
-        truckDetailViewModel.setTruckId(intent.getStringExtra("TRUCK_ID"))
+        truckDetailViewModel.setOrderId(intent.getStringExtra("ORDER_ID"))
 
         truckDetailViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 _user = it.data()!!
+                truckDetailViewModel.setUserModel(_user);
                 truckDetailViewModel.setDepotId(_user.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
@@ -128,8 +127,17 @@ class TruckDetailActivity : BaseActivity() {
 
         truckDetailViewModel.getTruck().observe(this, Observer {
             if (it.isSuccessful) {
-                DepotTruck = it.data()
-                initialTruckValues(it.data()!!)
+                // DepotTruck = it.data()
+                initialOrderValues(it.data()!!)
+            } else {
+                Timber.e(it.error())
+            }
+        })
+
+        truckDetailViewModel.getOrder().observe(this, Observer {
+            if (it.isSuccessful) {
+                depotOrder = it.data()
+                initialOrderValues(it.data()!!)
             } else {
                 Timber.e(it.error())
             }
@@ -146,37 +154,37 @@ class TruckDetailActivity : BaseActivity() {
     }
 
 
-    private fun initialTruckValues(truck: TruckModel) {
+    private fun initialOrderValues(order: OrderModel) {
 
         _fuelTypeList.clear()
         _fuelTypeList.add("EMPTY")
 
-        if (truck.fuel?.pms?.qty != 0) _fuelTypeList.add("PMS")
-        if (truck.fuel?.ago?.qty != 0) _fuelTypeList.add("AGO")
-        if (truck.fuel?.ik?.qty != 0) _fuelTypeList.add("IK")
+        if (order.fuel?.pms?.qty != 0) _fuelTypeList.add("PMS")
+        if (order.fuel?.ago?.qty != 0) _fuelTypeList.add("AGO")
+        if (order.fuel?.ik?.qty != 0) _fuelTypeList.add("IK")
 
-        tv_truck_id.text = truck.truckId!!
-        tv_customer_value.text = truck.company?.name
-        et_driver_name.setText(truck.drivername)
-        et_driver_id.setText(truck.driverid)
-        et_driver_plate.setText(truck.numberplate)
+        tv_truck_id.text = order.QbConfig?.InvoiceId
+        tv_customer_value.text = order.customer?.name
+        et_driver_name.setText(order.truck?.driverdetail?.name)
+        et_driver_id.setText(order.truck?.driverdetail?.id)
+        et_driver_plate.setText(order.truck?.truckdetail?.numberplate)
 
         // fuel
-        tv_pms.text = "PMS [ " + truck.fuel?.pms?.qty + " ]"
-        tv_ago.text = "AGO [ " + truck.fuel?.ago?.qty + " ]"
-        tv_ik.text = "IK      [ " + truck.fuel?.ik?.qty + " ]"
+        tv_pms.text = "PMS [ " + order.fuel?.pms?.qty + " ]"
+        tv_ago.text = "AGO [ " + order.fuel?.ago?.qty + " ]"
+        tv_ik.text = "IK      [ " + order.fuel?.ik?.qty + " ]"
 
 
         // fuel entries
 
-        tv_pms_entry.text = getBatchName(truck.fuel?.pms!!)
-        tv_ago_entry.text = getBatchName(truck.fuel?.ago!!)
-        tv_ik_entry.text = getBatchName(truck.fuel?.ik!!)
+        tv_pms_entry.text = getBatchName(order.fuel?.pms!!)
+        tv_ago_entry.text = getBatchName(order.fuel?.ago!!)
+        tv_ik_entry.text = getBatchName(order.fuel?.ik!!)
 
 
 
 
-        truck.compartments?.forEachIndexed { index, compartment ->
+        order.truck?.compartments?.forEachIndexed { index, compartment ->
             if (compartment.qty != null && compartment.qty != 0) {
                 btnComp[index].text = compartment.fueltype?.toUpperCase()
                 viewComp[index].setText(compartment.qty!!.toString())
@@ -188,7 +196,7 @@ class TruckDetailActivity : BaseActivity() {
             }
         }
 
-        tv_auth_by_value.text = truck.stagedata!!["1"]?.user?.name
+        tv_auth_by_value.text = order.stagedata!!["1"]?.user?.name
 
         // display name
         tv_confirmed_by_value.text = firebaseAuth.currentUser?.displayName
@@ -206,7 +214,7 @@ class TruckDetailActivity : BaseActivity() {
 
 
         val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${truck.truckId}"
+            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${order.truckId}"
 
         val dimensions = imageUtil.dpToPx(this, 150)
 
@@ -230,7 +238,7 @@ class TruckDetailActivity : BaseActivity() {
         /**
          * disable views if the truck is already printed
          * */
-        if (truck.isPrinted!!) {
+        if (order.isPrinted!!) {
             activityUtil.disableViews(layout_constraint)
             btnPrint.isEnabled = true
         }

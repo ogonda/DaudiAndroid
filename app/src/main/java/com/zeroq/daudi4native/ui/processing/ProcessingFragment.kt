@@ -209,9 +209,9 @@ class ProcessingFragment : BaseFragment() {
         super.onStop()
     }
 
-    private fun startTruckDetailActivity(truckId: String?) {
+    private fun startTruckDetailActivity(orderId: String?) {
         val intent = Intent(activity, TruckDetailActivity::class.java)
-        intent.putExtra("TRUCK_ID", truckId)
+        intent.putExtra("ORDER_ID", orderId)
         startActivity(intent)
         // animate
         activity!!.overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left)

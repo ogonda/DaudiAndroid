@@ -64,10 +64,6 @@ class TruckDetailViewModel @Inject constructor(
         if (orderId != _orderId.value) _orderId.value = orderId
     }
 
-    fun setTruckId(truckId: String) {
-        if (truckId != _truckId.value) _truckId.value = truckId
-    }
-
     fun setDepotId(depotId: String) {
         if (depotId != _depotId.value) _depotId.value = depotId
     }
