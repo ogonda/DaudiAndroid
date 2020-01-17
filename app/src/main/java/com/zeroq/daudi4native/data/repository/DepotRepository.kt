@@ -96,7 +96,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            val expireObj = Expiry(startDate, expireDate, null)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["1"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -203,7 +203,7 @@ class DepotRepository
                 val expireDate = calendar.time
 
 
-                val expireObj = Expiry(startDate, expireDate)
+                val expireObj = Expiry(startDate, expireDate, null)
                 val exp: ArrayList<Expiry> = ArrayList()
 
                 exp.add(expireObj)
@@ -270,7 +270,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            val expireObj = Expiry(startDate, expireDate, null)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["2"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -324,7 +324,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            val expireObj = Expiry(startDate, expireDate, null)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["2"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -385,7 +385,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            val expireObj = Expiry(startDate, expireDate, null)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["3"]?.data?.expiry
             exp?.add(0, expireObj)
@@ -443,7 +443,7 @@ class DepotRepository
             /**
              * modify the truck object
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            val expireObj = Expiry(startDate, expireDate, null)
 
             val exp: ArrayList<Expiry>? = truck?.stagedata!!["3"]?.data?.expiry
             exp?.add(0, expireObj)

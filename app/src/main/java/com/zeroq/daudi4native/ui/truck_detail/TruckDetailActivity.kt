@@ -2,7 +2,9 @@ package com.zeroq.daudi4native.ui.truck_detail
 
 import android.app.Dialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.Editable
 import android.text.InputFilter
@@ -72,7 +74,7 @@ class TruckDetailActivity : BaseActivity() {
     private lateinit var _topInputs: List<EditText>
 
     private lateinit var _user: UserModel
-   // private var DepotTruck: TruckModel? = null
+    // private var DepotTruck: TruckModel? = null
     private var depotOrder: OrderModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,7 +103,10 @@ class TruckDetailActivity : BaseActivity() {
         * set  the viewModel
         * */
         truckDetailViewModel = getViewModel(TruckDetailViewModel::class.java)
-        truckDetailViewModel.setOrderId(intent.getStringExtra("ORDER_ID"))
+        intent.getStringExtra("ORDER_ID")?.let { id ->
+            truckDetailViewModel.setOrderId(id)
+        }
+
 
         truckDetailViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
@@ -119,16 +124,6 @@ class TruckDetailActivity : BaseActivity() {
                 it.data()?.let { depo ->
                     tv_depot_name_d.text = "[ ${depo.Name} ]"
                 }
-            } else {
-                Timber.e(it.error())
-            }
-        })
-
-
-        truckDetailViewModel.getTruck().observe(this, Observer {
-            if (it.isSuccessful) {
-                // DepotTruck = it.data()
-                initialOrderValues(it.data()!!)
             } else {
                 Timber.e(it.error())
             }
@@ -177,6 +172,7 @@ class TruckDetailActivity : BaseActivity() {
 
         // fuel entries
 
+
         tv_pms_entry.text = getBatchName(order.fuel?.pms!!)
         tv_ago_entry.text = getBatchName(order.fuel?.ago!!)
         tv_ik_entry.text = getBatchName(order.fuel?.ik!!)
@@ -196,7 +192,7 @@ class TruckDetailActivity : BaseActivity() {
             }
         }
 
-        tv_auth_by_value.text = order.stagedata!!["1"]?.user?.name
+        tv_auth_by_value.text = order.truckStageData!!["1"]?.user?.name
 
         // display name
         tv_confirmed_by_value.text = firebaseAuth.currentUser?.displayName
@@ -214,7 +210,7 @@ class TruckDetailActivity : BaseActivity() {
 
 
         val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${order.truckId}"
+            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${order.QbConfig?.InvoiceId}"
 
         val dimensions = imageUtil.dpToPx(this, 150)
 
@@ -238,7 +234,9 @@ class TruckDetailActivity : BaseActivity() {
         /**
          * disable views if the truck is already printed
          * */
-        if (order.isPrinted!!) {
+        if (order.printStatus?.LoadingOrder?.status != null
+            && order.printStatus?.LoadingOrder?.status!!
+        ) {
             activityUtil.disableViews(layout_constraint)
             btnPrint.isEnabled = true
         }
@@ -361,14 +359,17 @@ class TruckDetailActivity : BaseActivity() {
 
 
     private fun getBatchName(batches: Batches): String? {
-//        val temp = if (batches.batches!!["1"]?.qty != 0) {
-//            batches.batches!!["1"]?.Name
-//        } else {
-//            batches.batches!!["0"]?.Name
-//        }
-//
-//        return temp ?: "****************"
-        return batches.toString()
+        if (!batches.entries.isNullOrEmpty()) {
+            val temp = if (batches.entries!![1].qty != null) {
+                batches.entries!![1].Name
+            } else {
+                batches.entries!![0].Name
+            }
+
+            return temp ?: "****************"
+        } else {
+            return "****************"
+        }
     }
 
 
@@ -413,9 +414,9 @@ class TruckDetailActivity : BaseActivity() {
          * local fuel inputs
          * */
 
-        var pmsLocal = DepotTruck?.fuel?.pms?.qty!!
-        var agoLocal = DepotTruck?.fuel?.ago?.qty!!
-        var ikLocal = DepotTruck?.fuel?.ik?.qty!!
+        var pmsLocal = depotOrder?.fuel?.pms?.qty!!
+        var agoLocal = depotOrder?.fuel?.ago?.qty!!
+        var ikLocal = depotOrder?.fuel?.ik?.qty!!
 
 
         // from buttons
@@ -458,8 +459,21 @@ class TruckDetailActivity : BaseActivity() {
             progressDialog.dismiss()
 
             val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
             if (vibrator.hasVibrator()) {
-                vibrator.run { vibrate(500) } // for 500 ms
+                vibrator.run {
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibrate(
+                            VibrationEffect.createOneShot(
+                                500,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrate(500)
+                    }
+                } // for 500 ms
 
 
                 toast("Make sure you have no errors")
@@ -496,7 +510,7 @@ class TruckDetailActivity : BaseActivity() {
         val numberPlate = et_driver_plate.text.toString().toUpperCase()
 
         truckDetailViewModel.updateTruckComAndDriver(
-            _user.config?.app?.depotid.toString(), DepotTruck?.Id!!,
+            _user.config?.app?.depotid.toString(), depotOrder?.Id!!,
             compList, driverId, driverName, numberPlate
         ).observe(this, Observer {
 
@@ -543,9 +557,9 @@ class TruckDetailActivity : BaseActivity() {
 
                     PrintingActivity.startPrintingActivity(
                         this,
-                        _user.config?.app?.depotid.toString(), DepotTruck?.Id!!,
+                        _user.config?.app?.depotid.toString(), depotOrder?.Id!!,
                         "1",
-                        DepotTruck?.config?.sandbox!!
+                        true
                     )
                 } else {
                     /**

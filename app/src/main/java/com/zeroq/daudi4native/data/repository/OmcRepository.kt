@@ -99,22 +99,19 @@ class OmcRepository @Inject constructor(
             val expireDate = calendar.time
 
             /**
-             * modify the truck object
+             *
+             * set expirely and the user
              * */
-            val expireObj = Expiry(startDate, expireDate)
-
-            val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
-            exp?.add(0, expireObj)
-
-            // commit to fireStore
-            transaction.update(orderRef, "truckStageData.1.expiry", exp)
-
-
             firebaseAuth.currentUser?.let {
-                val printedBy = AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+                val setbyExpire = AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                // commit current user
-                transaction.update(orderRef, "truckStageData.1.user", printedBy)
+                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
+                exp?.add(0, expireObj)
+
+                // commit to fireStore
+                transaction.update(orderRef, "truckStageData.1.expiry", exp)
             }
 
             return@runTransaction null
