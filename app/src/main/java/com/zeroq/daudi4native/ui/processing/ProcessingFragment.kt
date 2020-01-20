@@ -125,12 +125,15 @@ class ProcessingFragment : BaseFragment() {
             }
 
 
+        // what happens when the card body is clicked
         val cardBodyClick: Disposable = adapter.cardBodyClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 val printed = it?.order?.printStatus?.LoadingOrder?.status
 
-                if (printed!!) {
+                Timber.d("" + printed)
+
+                if (printed != null || printed == true) {
                     queueTruckDialog(it.order)
                 } else {
                     startTruckDetailActivity(it.order.Id)
@@ -206,9 +209,9 @@ class ProcessingFragment : BaseFragment() {
         super.onStop()
     }
 
-    private fun startTruckDetailActivity(truckId: String?) {
+    private fun startTruckDetailActivity(orderId: String?) {
         val intent = Intent(activity, TruckDetailActivity::class.java)
-        intent.putExtra("TRUCK_ID", truckId)
+        intent.putExtra("ORDER_ID", orderId)
         startActivity(intent)
         // animate
         activity!!.overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left)

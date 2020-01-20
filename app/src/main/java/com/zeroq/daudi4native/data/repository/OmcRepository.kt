@@ -1,15 +1,14 @@
 package com.zeroq.daudi4native.data.repository
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
-import com.zeroq.daudi4native.data.models.Expiry
-import com.zeroq.daudi4native.data.models.OmcModel
-import com.zeroq.daudi4native.data.models.OrderModel
-import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.vo.CompletionLiveData
+import com.zeroq.daudi4native.vo.DocumentLiveData
 import com.zeroq.daudi4native.vo.QueryLiveData
 import java.util.*
 import javax.inject.Inject
@@ -17,7 +16,8 @@ import javax.inject.Named
 
 class OmcRepository @Inject constructor(
     @Named("omc") val omc: CollectionReference,
-    val firestore: FirebaseFirestore
+    val firestore: FirebaseFirestore,
+    var firebaseAuth: FirebaseAuth
 ) {
 
 
@@ -33,6 +33,19 @@ class OmcRepository @Inject constructor(
         return QueryLiveData(ordersQuery(user), OrderModel::class.java)
     }
 
+    fun getOrder(combinedUserOrderId: Pair<UserModel, String>): DocumentLiveData<OrderModel> {
+        val user: UserModel = combinedUserOrderId.first
+        val orderId: String = combinedUserOrderId.second
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        val data: DocumentLiveData<OrderModel> = DocumentLiveData(orderRef, OrderModel::class.java)
+        orderRef.addSnapshotListener(data)
+
+        return data
+    }
 
     private fun ordersQuery(user: UserModel): Query {
         return omc
@@ -64,6 +77,7 @@ class OmcRepository @Inject constructor(
         minutes: Long
     ): Task<Void> {
 
+
         /*
         * omc id will be from the user config for more security
         * */
@@ -85,15 +99,20 @@ class OmcRepository @Inject constructor(
             val expireDate = calendar.time
 
             /**
-             * modify the truck object
+             *
+             * set expirely and the user
              * */
-            val expireObj = Expiry(startDate, expireDate)
+            firebaseAuth.currentUser?.let {
+                val setbyExpire = AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-            val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
-            exp?.add(0, expireObj)
+                val expireObj = Expiry(startDate, expireDate, setbyExpire)
 
-            // commit to fireStore
-            transaction.update(orderRef, "truckStageData.1.expiry", exp)
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
+                exp?.add(0, expireObj)
+
+                // commit to fireStore
+                transaction.update(orderRef, "truckStageData.1.expiry", exp)
+            }
 
             return@runTransaction null
         }
