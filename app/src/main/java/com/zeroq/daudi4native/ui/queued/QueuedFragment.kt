@@ -13,6 +13,7 @@ import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.QueuedTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
 import com.zeroq.daudi4native.data.models.OrderModel
+import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.events.QueueingEvent
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
 import com.zeroq.daudi4native.utils.ActivityUtil
@@ -38,6 +39,9 @@ class QueuedFragment : BaseFragment() {
 
     private var _TAG: String = "QueuedFragment"
 
+
+    private var user: UserModel? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -52,7 +56,7 @@ class QueuedFragment : BaseFragment() {
 
         queuedViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
-                val user = it.data()
+                user = it.data()
                 queuedViewModel.setDepoId(user?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
@@ -140,16 +144,18 @@ class QueuedFragment : BaseFragment() {
         expireSub = null
 
         val expireDialog = TimeDialogFragment("Enter Additional Time", order)
-        expireSub = expireDialog.timeEvent.subscribe { results ->
+        expireSub = expireDialog.timeEvent.subscribe {
 
-            queuedViewModel.updateExpire(results.order.Id!!, results.minutes.toLong())
-                .observe(this, Observer { state ->
-                    if (!state.isSuccessful) {
-                        Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
-                            .show()
-                        Timber.e(state.error())
-                    }
-                })
+            user?.let { u ->
+                queuedViewModel.updateExpire(u, order, it.minutes.toLong())
+                    .observe(this, Observer { state ->
+                        if (!state.isSuccessful) {
+                            Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
+                                .show()
+                            Timber.e(state.error())
+                        }
+                    })
+            }
         }
 
         expireDialog.show(fragmentManager!!, _TAG)

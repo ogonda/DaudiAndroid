@@ -285,4 +285,66 @@ class OmcRepository @Inject constructor(
 
         }
     }
+
+
+    /*
+    * update processing expire time
+    * */
+    fun updateQueueExpire(
+        user: UserModel,
+        order: OrderModel,
+        minutes: Long
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updateQueueExpireTask(user, order, minutes).addOnCompleteListener(completion)
+        return completion
+    }
+
+
+    private fun updateQueueExpireTask(
+        user: UserModel,
+        orderData: OrderModel,
+        minutes: Long
+    ): Task<Void> {
+        /*
+        * omc id will be from the user config for more security
+        * */
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderData.Id!!)
+
+
+        return firestore.runTransaction { transaction: Transaction ->
+            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
+
+            // add new time
+            val startDate = Calendar.getInstance().time
+
+            val calendar = Calendar.getInstance()
+            calendar.time = startDate
+            calendar.add(Calendar.MINUTE, minutes.toInt())
+
+            val expireDate = calendar.time
+
+            /**
+             *
+             * set expirely and the user
+             * */
+            firebaseAuth.currentUser?.let {
+                val setbyExpire =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["2"]?.expiry
+                exp?.add(0, expireObj)
+
+                // commit to fireStore
+                transaction.update(orderRef, "truckStageData.2.expiry", exp)
+            }
+
+            return@runTransaction null
+        }
+
+    }
 }
