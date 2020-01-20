@@ -393,6 +393,7 @@ class TruckDetailActivity : BaseActivity() {
             }).check()
     }
 
+
     private fun validateAndPost() {
         /**
          * check top inputs
@@ -458,8 +459,9 @@ class TruckDetailActivity : BaseActivity() {
 
             progressDialog.dismiss()
 
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            toast("Make sure you have no errors")
 
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             if (vibrator.hasVibrator()) {
                 vibrator.run {
                     if (Build.VERSION.SDK_INT >= 26) {
@@ -474,9 +476,6 @@ class TruckDetailActivity : BaseActivity() {
                         vibrate(500)
                     }
                 } // for 500 ms
-
-
-                toast("Make sure you have no errors")
             }
         }
 
@@ -509,9 +508,13 @@ class TruckDetailActivity : BaseActivity() {
         val driverId = et_driver_id.text.toString().toUpperCase()
         val numberPlate = et_driver_plate.text.toString().toUpperCase()
 
-        truckDetailViewModel.updateTruckComAndDriver(
-            _user.config?.app?.depotid.toString(), depotOrder?.Id!!,
-            compList, driverId, driverName, numberPlate
+        truckDetailViewModel.updateCompartmentAndDriver(
+            _user,
+            depotOrder?.Id!!,
+            compList,
+            driverId,
+            driverName,
+            numberPlate
         ).observe(this, Observer {
 
             if (it.isSuccessful) {
@@ -557,9 +560,8 @@ class TruckDetailActivity : BaseActivity() {
 
                     PrintingActivity.startPrintingActivity(
                         this,
-                        _user.config?.app?.depotid.toString(), depotOrder?.Id!!,
-                        "1",
-                        true
+                        depotOrder?.Id!!,
+                        "1"
                     )
                 } else {
                     /**

@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.services.BluetoothService
 import com.zeroq.daudi4native.ui.device_list.DeviceListActivity
 import com.zeroq.daudi4native.utils.PrintPic
@@ -34,12 +35,11 @@ class PrintingActivity : BaseActivity() {
     private var mService: BluetoothService? = null
     private var con_dev: BluetoothDevice? = null
 
+    private var orderId: String? = null
+    private var stage: String? = null
 
-    private lateinit var depotId: String
-    private lateinit var idTruck: String
-    private lateinit var stage: String
-    private var sandbox: Boolean? = false
 
+    private var user: UserModel? = null
 
     companion object {
         private const val REQUEST_ENABLE_BT = 2
@@ -47,15 +47,13 @@ class PrintingActivity : BaseActivity() {
 
 
         fun startPrintingActivity(
-            context: Context, depotId: String,
-            idTruck: String, stage: String,
-            sandbox: Boolean
+            context: Context,
+            orderId: String,
+            stage: String
         ) {
             val intent = Intent(context, PrintingActivity::class.java)
-            intent.putExtra("DEPOTID", depotId)
-            intent.putExtra("IDTRUCK", idTruck)
+            intent.putExtra("ORDERID", orderId)
             intent.putExtra("STAGE", stage)
-            intent.putExtra("SANDBOX", sandbox)
 
             context.startActivity(intent)
         }
@@ -70,17 +68,19 @@ class PrintingActivity : BaseActivity() {
         printingViewModel = getViewModel(PrintingViewModel::class.java)
 
         if (intent.extras != null) {
-            depotId = intent.getStringExtra("DEPOTID")
-            idTruck = intent.getStringExtra("IDTRUCK")
+            orderId = intent.getStringExtra("ORDERID")
             stage = intent.getStringExtra("STAGE")
-            sandbox = intent.getBooleanExtra("SANDBOX", false)
+
+
         }
 
-        if (sandbox!!) {
-            btn_sandbox.visibility = View.VISIBLE
-        } else {
-            btn_sandbox.visibility = View.GONE
-        }
+        printingViewModel.getUser().observe(this, Observer {
+            if (it.isSuccessful) {
+                user = it.data()
+            } else {
+                Timber.e(it.error()!!)
+            }
+        })
 
 
         setSupportActionBar(toolbar as Toolbar)
@@ -100,8 +100,8 @@ class PrintingActivity : BaseActivity() {
         operationBtns()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             android.R.id.home ->
                 cleanUp()
         }
@@ -267,11 +267,21 @@ class PrintingActivity : BaseActivity() {
 
     @SuppressLint("SdCardPath")
     private fun printImage() {
-        var sendData: ByteArray? = null
+        val sendData: ByteArray?
         val pg = PrintPic()
         pg.initCanvas(537)
         pg.initPaint()
-        pg.drawImage(0f, 0f, Environment.getExternalStorageDirectory().absolutePath + "/Emkaynow/0.png")
+
+
+        // path
+        @Suppress("DEPRECATION")
+        val pathDir = Environment.getExternalStorageDirectory().absolutePath + "/Emkaynow/0.png"
+
+        pg.drawImage(
+            0f,
+            0f,
+            pathDir
+        )
         sendData = pg.printDraw()
         mService!!.write(sendData)
     }
@@ -287,7 +297,7 @@ class PrintingActivity : BaseActivity() {
 
     private fun databasePrintTransactions() {
         if (stage == "1") {
-            printingViewModel.setPrintedState(depotId, idTruck)
+            printingViewModel.setLoadingPrintedState(user!!, orderId!!)
                 .observe(this@PrintingActivity, Observer {
                     if (!it.isSuccessful) {
                         Timber.e(it.error())
@@ -299,7 +309,7 @@ class PrintingActivity : BaseActivity() {
 
 
         if (stage == "3") {
-            printingViewModel.completeOrder(depotId, idTruck)
+            printingViewModel.setGatePassPrintedState(user!!, orderId!!)
                 .observe(this@PrintingActivity, Observer {
                     if (!it.isSuccessful) {
                         Timber.e(it.error())

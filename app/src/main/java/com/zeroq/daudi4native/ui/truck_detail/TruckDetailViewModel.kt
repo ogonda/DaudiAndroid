@@ -1,6 +1,7 @@
 package com.zeroq.daudi4native.ui.truck_detail
 
 import androidx.lifecycle.*
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.data.repository.AdminRepository
@@ -43,11 +44,11 @@ class TruckDetailViewModel @Inject constructor(
             _combinedDepoTruckId.value = it
         })
 
+        _depo = Transformations.switchMap(_userModel, depotRepository::getDepot)
+
         _userModel.combineLatest(_orderId).observeForever {
             _combinedUserOrderId.value = it
         }
-
-        _truck = Transformations.switchMap(_combinedDepoTruckId, depotRepository::getTruck)
 
         _order = Transformations.switchMap(_combinedUserOrderId, omcRepository::getOrder)
 
@@ -72,10 +73,6 @@ class TruckDetailViewModel @Inject constructor(
         return _user
     }
 
-    fun getTruck(): LiveData<Resource<TruckModel>> {
-        return _truck
-    }
-
     fun getOrder(): LiveData<Resource<OrderModel>> {
         return _order
     }
@@ -84,16 +81,21 @@ class TruckDetailViewModel @Inject constructor(
         return _depo
     }
 
-    fun updateTruckComAndDriver(
-        depotId: String,
-        idTruck: String,
+    fun updateCompartmentAndDriver(
+        user: UserModel,
+        orderId: String,
         compartmentList: List<Compartment>,
         driverId: String, driverName: String, numberPlate: String
     ): CompletionLiveData {
-        return depotRepository.updateCompartmentAndDriver(
-            depotId, idTruck, compartmentList,
-            driverId, driverName, numberPlate
+        return omcRepository.updateOrderDetails(
+            user,
+            orderId,
+            compartmentList,
+            driverId,
+            driverName,
+            numberPlate
         )
     }
+
 
 }

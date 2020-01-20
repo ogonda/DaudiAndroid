@@ -47,15 +47,13 @@ class ProcessingViewModel @Inject constructor(
         return omcRepository.updateProcessingExpire(user, order, minutes)
     }
 
+
     fun moveToQueuing(
-        idTruck: String, minutes: Long
+        user: UserModel,
+        orderId: String,
+        minutes: Long
     ): CompletionLiveData {
-        return depotRepository.pushToueueing(
-            _depotId.value!!,
-            idTruck,
-            minutes,
-            firebaseAuth.currentUser!!
-        )
+        return omcRepository.moveToQueuing(user, orderId, minutes)
     }
 
 

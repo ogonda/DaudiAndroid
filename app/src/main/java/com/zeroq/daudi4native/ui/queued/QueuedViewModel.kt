@@ -5,15 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
+import com.zeroq.daudi4native.data.repository.OmcRepository
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.Resource
 import javax.inject.Inject
 
 class QueuedViewModel @Inject constructor(
     adminRepo: AdminRepository,
+    var omcRepository: OmcRepository,
     var depotRepository: DepotRepository,
     var firebaseAuth: FirebaseAuth
 ) : ViewModel() {
@@ -37,12 +40,17 @@ class QueuedViewModel @Inject constructor(
         if (depotid != _depotId.value) _depotId.value = depotid
     }
 
-    fun updateExpire(idTruck: String, minutes: Long): CompletionLiveData {
-        return depotRepository.queueAddExpire(_depotId.value!!, idTruck, minutes)
+    fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
+        return omcRepository.updateQueueExpire(user, order, minutes)
     }
 
-    fun pushToLoading(idTruck: String, minutes: Long): CompletionLiveData {
-        return depotRepository.pushToLoading(_depotId.value!!, idTruck, minutes, firebaseAuth.currentUser!!)
+
+    fun pushToLoading(
+        user: UserModel,
+        orderId: String,
+        minutes: Long
+    ): CompletionLiveData {
+        return omcRepository.pushToLoading(user, orderId, minutes)
     }
 
 }
