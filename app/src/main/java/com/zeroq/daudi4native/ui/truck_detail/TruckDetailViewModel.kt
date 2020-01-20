@@ -43,11 +43,11 @@ class TruckDetailViewModel @Inject constructor(
             _combinedDepoTruckId.value = it
         })
 
+        _depo = Transformations.switchMap(_userModel, depotRepository::getDepot)
+
         _userModel.combineLatest(_orderId).observeForever {
             _combinedUserOrderId.value = it
         }
-
-        _truck = Transformations.switchMap(_combinedDepoTruckId, depotRepository::getTruck)
 
         _order = Transformations.switchMap(_combinedUserOrderId, omcRepository::getOrder)
 
@@ -70,10 +70,6 @@ class TruckDetailViewModel @Inject constructor(
 
     fun getUser(): LiveData<Resource<UserModel>> {
         return _user
-    }
-
-    fun getTruck(): LiveData<Resource<TruckModel>> {
-        return _truck
     }
 
     fun getOrder(): LiveData<Resource<OrderModel>> {
