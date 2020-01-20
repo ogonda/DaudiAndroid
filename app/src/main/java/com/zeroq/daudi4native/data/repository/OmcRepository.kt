@@ -103,7 +103,8 @@ class OmcRepository @Inject constructor(
              * set expirely and the user
              * */
             firebaseAuth.currentUser?.let {
-                val setbyExpire = AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+                val setbyExpire =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
                 val expireObj = Expiry(startDate, expireDate, setbyExpire)
 
@@ -117,5 +118,56 @@ class OmcRepository @Inject constructor(
             return@runTransaction null
         }
 
+    }
+
+
+    fun updateOrderDetails(
+        user: UserModel,
+        orderId: String,
+        compartmentList: List<Compartment>,
+        driverId: String,
+        driverName: String,
+        numberPlate: String
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updateOrderDetailsTask(
+            user,
+            orderId,
+            compartmentList,
+            driverId,
+            driverName,
+            numberPlate
+        ).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+    private fun updateOrderDetailsTask(
+        user: UserModel,
+        orderId: String,
+        compartmentList: List<Compartment>,
+        driverId: String,
+        driverName: String,
+        numberPlate: String
+    ): Task<Void> {
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
+
+            transaction.update(orderRef, "truck.driverdetail.id", driverId)
+            transaction.update(orderRef, "truck.driverdetail.name", driverName)
+            transaction.update(orderRef, "truck.truckdetail.numberplate", numberPlate)
+
+            /*
+            * update compartment array
+            * */
+            transaction.update(orderRef, "truck.compartments", compartmentList)
+
+            return@runTransaction null
+        }
     }
 }

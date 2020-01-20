@@ -1,6 +1,7 @@
 package com.zeroq.daudi4native.ui.truck_detail
 
 import androidx.lifecycle.*
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.data.models.*
 import com.zeroq.daudi4native.data.repository.AdminRepository
@@ -80,16 +81,21 @@ class TruckDetailViewModel @Inject constructor(
         return _depo
     }
 
-    fun updateTruckComAndDriver(
-        depotId: String,
-        idTruck: String,
+    fun updateCompartmentAndDriver(
+        user: UserModel,
+        orderId: String,
         compartmentList: List<Compartment>,
         driverId: String, driverName: String, numberPlate: String
     ): CompletionLiveData {
-        return depotRepository.updateCompartmentAndDriver(
-            depotId, idTruck, compartmentList,
-            driverId, driverName, numberPlate
+        return omcRepository.updateOrderDetails(
+            user,
+            orderId,
+            compartmentList,
+            driverId,
+            driverName,
+            numberPlate
         )
     }
+
 
 }
