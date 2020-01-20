@@ -347,4 +347,60 @@ class OmcRepository @Inject constructor(
         }
 
     }
+
+
+    fun pushToLoading(user: UserModel, orderId: String, minutes: Long):
+            CompletionLiveData {
+        val completion = CompletionLiveData()
+        pushToLoadingTask(user, orderId, minutes).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+    private fun pushToLoadingTask(user: UserModel, orderId: String, minutes: Long)
+            : Task<Void> {
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+
+            val order: OrderModel? = transaction
+                .get(orderRef)
+                .toObject(OrderModel::class.java)
+
+
+            // add new time
+            val startDate = Calendar.getInstance().time
+
+            val calendar = Calendar.getInstance()
+            calendar.time = startDate
+            calendar.add(Calendar.MINUTE, minutes.toInt())
+
+            val expireDate = calendar.time
+            /**
+             *
+             * set expirely and the user
+             * */
+            firebaseAuth.currentUser?.let {
+                val setbyExpire =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["3"]?.expiry
+                exp?.add(0, expireObj)
+
+                // commit to fireStore
+                transaction.update(orderRef, "truckStageData.3.expiry", exp)
+
+                // change stage to queueing
+                transaction.update(orderRef, "truck.stage", 3)
+            }
+
+            return@runTransaction null
+
+        }
+    }
 }

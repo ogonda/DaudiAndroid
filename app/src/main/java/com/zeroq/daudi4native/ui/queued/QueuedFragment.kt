@@ -169,14 +169,17 @@ class QueuedFragment : BaseFragment() {
 
 
         val toLoadingDialog = TimeDialogFragment("Enter Loading Time", order)
-        expireSub = toLoadingDialog.timeEvent.subscribe { results ->
+        expireSub = toLoadingDialog.timeEvent.subscribe {
 
-            queuedViewModel.pushToLoading(results.order.Id!!, results.minutes.toLong())
-                .observe(this, Observer { state ->
-                    if (!state.isSuccessful) {
+            queuedViewModel.pushToLoading(user!!, it.order.Id!!, it.minutes.toLong())
+                .observe(this, Observer { result ->
+                    if (result.isSuccessful) {
+                        Toast.makeText(activity, "Truck moved to processing", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
                         Toast.makeText(activity, "sorry an error occurred", Toast.LENGTH_SHORT)
                             .show()
-                        Timber.e(state.error())
+                        Timber.e(result.error())
                     }
                 })
         }

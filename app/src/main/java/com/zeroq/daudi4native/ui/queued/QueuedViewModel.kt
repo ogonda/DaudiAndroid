@@ -43,8 +43,14 @@ class QueuedViewModel @Inject constructor(
     fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
         return omcRepository.updateQueueExpire(user, order, minutes)
     }
-    fun pushToLoading(idTruck: String, minutes: Long): CompletionLiveData {
-        return depotRepository.pushToLoading(_depotId.value!!, idTruck, minutes, firebaseAuth.currentUser!!)
+
+
+    fun pushToLoading(
+        user: UserModel,
+        orderId: String,
+        minutes: Long
+    ): CompletionLiveData {
+        return omcRepository.pushToLoading(user, orderId, minutes)
     }
 
 }
