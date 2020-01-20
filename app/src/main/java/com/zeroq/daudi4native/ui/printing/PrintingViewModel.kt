@@ -14,7 +14,6 @@ import com.zeroq.daudi4native.vo.Resource
 import javax.inject.Inject
 
 class PrintingViewModel @Inject constructor(
-    var depotRepository: DepotRepository,
     var adminRepo: AdminRepository,
     var omcRepository: OmcRepository,
     firebaseAuth: FirebaseAuth

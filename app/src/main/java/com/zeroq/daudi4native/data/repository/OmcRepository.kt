@@ -13,6 +13,7 @@ import com.zeroq.daudi4native.vo.QueryLiveData
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
+import java.lang.Void as Void
 
 class OmcRepository @Inject constructor(
     @Named("omc") val omc: CollectionReference,
@@ -188,10 +189,10 @@ class OmcRepository @Inject constructor(
         return firestore.runTransaction { transaction ->
 
             firebaseAuth.currentUser?.let {
-                val user =
+                val assocUser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                val p = Printing(true, user)
+                val p = Printing(true, assocUser)
 
                 transaction.update(orderRef, "printStatus.LoadingOrder", p)
             }
@@ -218,15 +219,70 @@ class OmcRepository @Inject constructor(
         return firestore.runTransaction { transaction ->
 
             firebaseAuth.currentUser?.let {
-                val user =
+                val assocuser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                val p = Printing(true, user)
+                val p = Printing(true, assocuser)
 
                 transaction.update(orderRef, "printStatus.gatepass", p)
             }
 
             return@runTransaction null
+        }
+    }
+
+    fun moveToQueuing(user: UserModel, orderId: String, minutes: Long):
+            CompletionLiveData {
+        val completion = CompletionLiveData()
+        moveToQueuingTask(user, orderId, minutes).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+    private fun moveToQueuingTask(user: UserModel, orderId: String, minutes: Long)
+            : Task<Void> {
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+
+            val order: OrderModel? = transaction
+                .get(orderRef)
+                .toObject(OrderModel::class.java)
+
+
+            // add new time
+            val startDate = Calendar.getInstance().time
+
+            val calendar = Calendar.getInstance()
+            calendar.time = startDate
+            calendar.add(Calendar.MINUTE, minutes.toInt())
+
+            val expireDate = calendar.time
+            /**
+             *
+             * set expirely and the user
+             * */
+            firebaseAuth.currentUser?.let {
+                val setbyExpire =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
+                exp?.add(0, expireObj)
+
+                // commit to fireStore
+                transaction.update(orderRef, "truckStageData.2.expiry", exp)
+
+                // change stage to queueing
+                transaction.update(orderRef, "truck.stage", 2)
+            }
+
+            return@runTransaction null
+
         }
     }
 }

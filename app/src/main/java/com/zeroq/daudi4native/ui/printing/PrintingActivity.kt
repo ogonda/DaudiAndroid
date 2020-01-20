@@ -100,8 +100,8 @@ class PrintingActivity : BaseActivity() {
         operationBtns()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             android.R.id.home ->
                 cleanUp()
         }
@@ -267,14 +267,20 @@ class PrintingActivity : BaseActivity() {
 
     @SuppressLint("SdCardPath")
     private fun printImage() {
-        var sendData: ByteArray? = null
+        val sendData: ByteArray?
         val pg = PrintPic()
         pg.initCanvas(537)
         pg.initPaint()
+
+
+        // path
+        @Suppress("DEPRECATION")
+        val pathDir = Environment.getExternalStorageDirectory().absolutePath + "/Emkaynow/0.png"
+
         pg.drawImage(
             0f,
             0f,
-            Environment.getExternalStorageDirectory().absolutePath + "/Emkaynow/0.png"
+            pathDir
         )
         sendData = pg.printDraw()
         mService!!.write(sendData)

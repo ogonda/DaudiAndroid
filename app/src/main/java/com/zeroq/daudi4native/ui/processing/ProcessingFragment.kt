@@ -183,7 +183,7 @@ class ProcessingFragment : BaseFragment() {
 
         val queueDialog = TimeDialogFragment("Enter Queueing Time", order)
         queueSub = queueDialog.timeEvent.subscribe {
-            processingViewModel.moveToQueuing(it.order.Id!!, it.minutes.toLong())
+            processingViewModel.moveToQueuing(user!!, it.order.Id!!, it.minutes.toLong())
                 .observe(this, Observer { result ->
                     if (result.isSuccessful) {
                         Toast.makeText(activity, "Truck moved to processing", Toast.LENGTH_SHORT)

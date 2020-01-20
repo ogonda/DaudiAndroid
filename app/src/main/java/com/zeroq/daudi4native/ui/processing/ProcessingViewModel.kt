@@ -59,4 +59,13 @@ class ProcessingViewModel @Inject constructor(
     }
 
 
+    fun moveToQueuing(
+        user: UserModel,
+        orderId: String,
+        minutes: Long
+    ): CompletionLiveData {
+        return omcRepository.moveToQueuing(user, orderId, minutes)
+    }
+
+
 }

@@ -269,12 +269,11 @@ class LoadingOrderActivity : BaseActivity() {
 
                 if (it) {
                     hideButton(false)
-                    PrintingActivity.startPrintingActivity(
-                        this,
-                        _user.config?.app?.depotid.toString(), liveTruck.Id!!,
-                        "3",
-                        liveTruck.config?.sandbox!!
-                    )
+//                    PrintingActivity.startPrintingActivity(
+//                        this,
+//                        _user.config?.app?.depotid.toString(), liveTruck.Id!!,
+//                        "3"
+//                    )
                 } else {
                     hideButton(false)
                     toast("Sorry an error occurred")
