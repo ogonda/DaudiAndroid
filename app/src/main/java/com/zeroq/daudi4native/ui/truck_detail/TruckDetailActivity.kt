@@ -560,9 +560,8 @@ class TruckDetailActivity : BaseActivity() {
 
                     PrintingActivity.startPrintingActivity(
                         this,
-                        _user.config?.app?.depotid.toString(), depotOrder?.Id!!,
-                        "1",
-                        true
+                        depotOrder?.Id!!,
+                        "1"
                     )
                 } else {
                     /**

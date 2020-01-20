@@ -45,7 +45,7 @@ class ProcessingFragment : BaseFragment() {
 
     private lateinit var processingViewModel: ProcessingViewModel
 
-    private var user: UserModel? = null;
+    private var user: UserModel? = null
 
 
     override fun onCreateView(

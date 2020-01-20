@@ -156,7 +156,6 @@ class OmcRepository @Inject constructor(
             .document(orderId)
 
         return firestore.runTransaction { transaction ->
-            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
 
             transaction.update(orderRef, "truck.driverdetail.id", driverId)
             transaction.update(orderRef, "truck.driverdetail.name", driverName)
@@ -166,6 +165,66 @@ class OmcRepository @Inject constructor(
             * update compartment array
             * */
             transaction.update(orderRef, "truck.compartments", compartmentList)
+
+            return@runTransaction null
+        }
+    }
+
+
+    fun updatePrintedStateLoading(user: UserModel, orderId: String): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updatePrintedStateLoadingTask(user, orderId).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+    private fun updatePrintedStateLoadingTask(user: UserModel, orderId: String):
+            Task<Void> {
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+
+            firebaseAuth.currentUser?.let {
+                val user =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val p = Printing(true, user)
+
+                transaction.update(orderRef, "printStatus.LoadingOrder", p)
+            }
+
+            return@runTransaction null
+        }
+    }
+
+
+    fun updatePrintedStateGatePass(user: UserModel, orderId: String): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updatePrintedStateGatePassTask(user, orderId).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+    private fun updatePrintedStateGatePassTask(user: UserModel, orderId: String):
+            Task<Void> {
+
+        val orderRef = omc.document(user.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+
+            firebaseAuth.currentUser?.let {
+                val user =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val p = Printing(true, user)
+
+                transaction.update(orderRef, "printStatus.gatepass", p)
+            }
 
             return@runTransaction null
         }
