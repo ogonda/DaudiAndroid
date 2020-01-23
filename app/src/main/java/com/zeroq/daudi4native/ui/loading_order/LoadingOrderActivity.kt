@@ -140,7 +140,7 @@ class LoadingOrderActivity : BaseActivity() {
                 initialTruckValues(it.data()!!)
 
             } else {
-                Timber.e(it.error()!!)
+                Timber.e(it.error())
             }
         })
 

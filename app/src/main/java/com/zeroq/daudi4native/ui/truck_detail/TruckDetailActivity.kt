@@ -487,9 +487,7 @@ class TruckDetailActivity : BaseActivity() {
 
         btnComp.forEachIndexed { index, appCompatButton ->
 
-            val btnValue: String = appCompatButton.text.toString()
-
-            when (btnValue) {
+            when (val btnValue: String = appCompatButton.text.toString()) {
                 "EMPTY" ->
                     compList.add(Compartment(index, null, null))
 

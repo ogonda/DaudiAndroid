@@ -12,10 +12,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.ui.auth.data.model.User
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.LoadingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
 import com.zeroq.daudi4native.data.models.OrderModel
+import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.events.LoadingEvent
 import com.zeroq.daudi4native.ui.dialogs.LoadingDialogFragment
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
@@ -42,6 +44,8 @@ class LoadingFragment : BaseFragment() {
     lateinit var viewModel: LoadingViewModel
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
+    var userModel: UserModel? = null;
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,8 +60,8 @@ class LoadingFragment : BaseFragment() {
 
         viewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
-                val user = it.data()
-                viewModel.setDepoId(user?.config?.app?.depotid.toString())
+                userModel = it.data()
+                viewModel.setDepoId(userModel?.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
             }
@@ -172,34 +176,38 @@ class LoadingFragment : BaseFragment() {
         sealSub?.dispose()
         sealSub = null
 
+        order.seals?.range?.let { ranges ->
+            if (ranges.isEmpty()) {
+                val sealDialog = LoadingDialogFragment(order)
+                sealSub = sealDialog.loadingEvent.subscribe {
+                    sealDialog.dismiss() // hide dialog
+                    progressDialog.show() // show dialog
 
-        if (order.truckStageData?.get("4") == null) {
-            val sealDialog = LoadingDialogFragment(order)
-            sealSub = sealDialog.loadingEvent.subscribe {
-                sealDialog.dismiss() // hide dialog
-                progressDialog.show() // show dialog
-
-                viewModel.updateSeals(order.Id!!, it).observe(this, Observer { result ->
-                    if (result.isSuccessful) {
-                        progressDialog.hide() // hide progress
-                        startLoadingOrderActivity(order.Id!!)
-                    } else {
-                        progressDialog.hide() // hide progress
-                        Toast.makeText(
-                            activity,
-                            "An error occurred while posting seal data",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        Timber.e(result.error())
+                    userModel?.let { user ->
+                        viewModel.updateSeals(user, it, order.Id!!)
+                            .observe(this, Observer { result ->
+                                if (result.isSuccessful) {
+                                    progressDialog.hide() // hide progress
+                                    startLoadingOrderActivity(order.Id!!)
+                                } else {
+                                    progressDialog.hide() // hide progress
+                                    Toast.makeText(
+                                        activity,
+                                        "An error occurred while posting seal data",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    Timber.e(result.error())
+                                }
+                            })
                     }
-                })
+                }
 
+                sealDialog.show(fragmentManager!!, _TAG)
+            } else {
+                startLoadingOrderActivity(order.Id!!)
             }
-
-            sealDialog.show(fragmentManager!!, _TAG)
-        } else {
-            startLoadingOrderActivity(order.Id!!)
         }
+
     }
 
 
