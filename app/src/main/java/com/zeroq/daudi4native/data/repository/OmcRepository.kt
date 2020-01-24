@@ -406,9 +406,13 @@ class OmcRepository @Inject constructor(
     }
 
     // update seals, update fuel reserves
-    fun updateSealAndFuel(user: UserModel,  loadingEvent: LoadingDialogEvent, orderId: String): CompletionLiveData {
+    fun updateSealAndFuel(
+        user: UserModel,
+        loadingEvent: LoadingDialogEvent,
+        orderId: String
+    ): CompletionLiveData {
         val completion = CompletionLiveData()
-        updateSealAndFuelTask(user,loadingEvent,orderId).addOnCompleteListener(completion);
+        updateSealAndFuelTask(user, loadingEvent, orderId).addOnCompleteListener(completion);
         return completion;
     }
 
@@ -465,12 +469,15 @@ class OmcRepository @Inject constructor(
 
                 val batchModel = transaction.get(fuelBatchRef).toObject(EntryModel::class.java)
 
-                val commulateTotalNumber = batchModel?.qty?.accumulated?.total!!.plus(pair.second)
-                val commulateUsableNumber = batchModel.qty?.accumulated?.usable!!.plus(pair.second)
+                val commulateTotalNumber =
+                    batchModel?.qty?.directLoad?.accumulated?.total!!.plus(pair.second)
+                val commulateUsableNumber =
+                    batchModel.qty?.directLoad?.accumulated?.usable!!.plus(pair.second)
+
 
                 // batchModel.status = 1
-                batchModel.qty?.accumulated?.total = commulateTotalNumber
-                batchModel.qty?.accumulated?.usable = commulateUsableNumber
+                batchModel?.qty?.directLoad?.accumulated?.total = commulateTotalNumber
+                batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
 
                 batchModels.add(Pair(fuelBatchRef, batchModel))
             }
@@ -481,7 +488,7 @@ class OmcRepository @Inject constructor(
                 //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
                 transaction.update(
                     batchModel!!.first, "qty.directLoad.accumulated",
-                    batchModel.second!!.qty?.accumulated
+                    batchModel.second!!.qty?.directLoad?.accumulated
                 )
             }
 
