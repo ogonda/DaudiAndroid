@@ -44,7 +44,7 @@ class LoadingViewModel @Inject constructor(
     }
 
     fun getDepot(): LiveData<Resource<DepotModel>> {
-        return _depo;
+        return _depo
     }
 
     fun setSwitchUser(user: UserModel) {

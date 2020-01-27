@@ -16,6 +16,7 @@ import com.firebase.ui.auth.data.model.User
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.LoadingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
+import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.events.LoadingEvent
@@ -45,6 +46,7 @@ class LoadingFragment : BaseFragment() {
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     var userModel: UserModel? = null
+    private var depot: DepotModel? = null
 
 
     override fun onCreateView(
@@ -71,8 +73,9 @@ class LoadingFragment : BaseFragment() {
 
         viewModel.getDepot().observe(this, Observer {
             if (it.isSuccessful) {
-
+                depot = it.data()
             } else {
+                depot = null
                 Timber.e(it.error())
             }
         })
@@ -194,7 +197,7 @@ class LoadingFragment : BaseFragment() {
                     progressDialog.show() // show dialog
 
                     userModel?.let { user ->
-                        viewModel.updateSeals(user, it, order.Id!!,)
+                        viewModel.updateSeals(user, it, order.Id!!, depot!!)
                             .observe(this, Observer { result ->
                                 if (result.isSuccessful) {
                                     progressDialog.hide() // hide progress
