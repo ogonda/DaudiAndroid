@@ -409,17 +409,20 @@ class OmcRepository @Inject constructor(
     fun updateSealAndFuel(
         user: UserModel,
         loadingEvent: LoadingDialogEvent,
-        orderId: String
+        orderId: String,
+        depotModel: DepotModel?
     ): CompletionLiveData {
         val completion = CompletionLiveData()
-        updateSealAndFuelTask(user, loadingEvent, orderId).addOnCompleteListener(completion);
-        return completion;
+        updateSealAndFuelTask(user, loadingEvent, orderId, depotModel?.config?.private!!)
+            .addOnCompleteListener(completion)
+        return completion
     }
 
-    fun updateSealAndFuelTask(
+    private fun updateSealAndFuelTask(
         userModel: UserModel,
         loadingEvent: LoadingDialogEvent,
-        orderId: String
+        orderId: String,
+        isPrivate: Boolean
     ): Task<Void> {
         val orderRef = omc.document(userModel.config?.omcId!!)
             .collection("orders")
@@ -476,7 +479,7 @@ class OmcRepository @Inject constructor(
 
 
                 // batchModel.status = 1
-                batchModel?.qty?.directLoad?.accumulated?.total = commulateTotalNumber
+                batchModel.qty?.directLoad?.accumulated?.total = commulateTotalNumber
                 batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
 
                 batchModels.add(Pair(fuelBatchRef, batchModel))
@@ -486,10 +489,17 @@ class OmcRepository @Inject constructor(
             // update batches
             batchModels.forEach { batchModel ->
                 //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
-                transaction.update(
-                    batchModel!!.first, "qty.directLoad.accumulated",
-                    batchModel.second!!.qty?.directLoad?.accumulated
-                )
+
+                // if is public
+                if(!isPrivate){
+                    transaction.update(
+                        batchModel!!.first, "qty.directLoad.accumulated",
+                        batchModel.second!!.qty?.directLoad?.accumulated
+                    )
+                }else {
+                    // if is private
+                }
+
             }
 
 
@@ -499,7 +509,7 @@ class OmcRepository @Inject constructor(
             /*
            * update seals
            * */
-            val sealsTemp: OrderSeals = OrderSeals(
+            val sealsTemp = OrderSeals(
                 ArrayList(loadingEvent.sealRange?.split("-")!!),
                 ArrayList(loadingEvent.brokenSeal?.split("-")!!)
             )

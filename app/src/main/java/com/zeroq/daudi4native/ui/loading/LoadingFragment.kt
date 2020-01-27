@@ -44,7 +44,8 @@ class LoadingFragment : BaseFragment() {
     lateinit var viewModel: LoadingViewModel
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    var userModel: UserModel? = null;
+    var userModel: UserModel? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,9 +62,18 @@ class LoadingFragment : BaseFragment() {
         viewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 userModel = it.data()
+                viewModel.setSwitchUser(userModel!!)
                 viewModel.setDepoId(userModel?.config?.app?.depotid.toString())
             } else {
-                Timber.e(it.error()!!)
+                Timber.e(it.error())
+            }
+        })
+
+        viewModel.getDepot().observe(this, Observer {
+            if (it.isSuccessful) {
+
+            } else {
+                Timber.e(it.error())
             }
         })
 
@@ -184,7 +194,7 @@ class LoadingFragment : BaseFragment() {
                     progressDialog.show() // show dialog
 
                     userModel?.let { user ->
-                        viewModel.updateSeals(user, it, order.Id!!)
+                        viewModel.updateSeals(user, it, order.Id!!,)
                             .observe(this, Observer { result ->
                                 if (result.isSuccessful) {
                                     progressDialog.hide() // hide progress
