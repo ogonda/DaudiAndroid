@@ -1,18 +1,19 @@
 package com.zeroq.daudi4native.data.repository
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.Transaction
+import com.google.firebase.firestore.*
 import com.zeroq.daudi4native.data.models.*
+import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.DocumentLiveData
 import com.zeroq.daudi4native.vo.QueryLiveData
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.collections.ArrayList
 import java.lang.Void as Void
 
 class OmcRepository @Inject constructor(
@@ -401,6 +402,149 @@ class OmcRepository @Inject constructor(
 
             return@runTransaction null
 
+        }
+    }
+
+    // update seals, update fuel reserves
+    fun updateSealAndFuel(
+        user: UserModel,
+        loadingEvent: LoadingDialogEvent,
+        orderId: String,
+        depotModel: DepotModel?
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updateSealAndFuelTask(user, loadingEvent, orderId, depotModel?.config?.private!!)
+            .addOnCompleteListener(completion)
+        return completion
+    }
+
+    private fun updateSealAndFuelTask(
+        userModel: UserModel,
+        loadingEvent: LoadingDialogEvent,
+        orderId: String,
+        isPrivate: Boolean
+    ): Task<Void> {
+        val orderRef = omc.document(userModel.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+
+        return firestore.runTransaction { transaction ->
+            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
+
+            /**
+             * let get other elements
+             *
+             * 1. update truck.fuel.FUELtTYPE.batches["0|1"].
+             * */
+            val fuels = listOf(
+                Triple("pms", order?.fuel?.pms, loadingEvent.pmsLoaded),
+                Triple("ago", order?.fuel?.ago, loadingEvent.agoLoaded),
+                Triple("ik", order?.fuel?.ik, loadingEvent.ikLoaded)
+            )
+
+            val updateFuelBatch: ArrayList<Pair<String, Int>> = ArrayList()
+
+            fuels.forEach { triple ->
+                val bQuantity = triple.second?.qty
+
+                if (bQuantity != null && bQuantity > 0) {
+                    Timber.e(triple.third.toString())
+
+                    val fuelId = mutateFuelObservered(triple.second!!, triple.third)
+
+                    val obLost = bQuantity.minus(triple.third!!)
+
+                    updateFuelBatch.add(Pair(fuelId, obLost))
+                }
+            }
+
+
+            // store batch models
+            val batchModels: ArrayList<Pair<DocumentReference, EntryModel?>?> = ArrayList()
+
+            updateFuelBatch.forEach { pair ->
+
+                val fuelBatchRef = omc
+                    .document(userModel.config?.omcId!!)
+                    .collection("entries")
+                    .document(pair.first)
+
+                val batchModel = transaction.get(fuelBatchRef).toObject(EntryModel::class.java)
+
+                val commulateTotalNumber =
+                    batchModel?.qty?.directLoad?.accumulated?.total!!.plus(pair.second)
+                val commulateUsableNumber =
+                    batchModel.qty?.directLoad?.accumulated?.usable!!.plus(pair.second)
+
+
+                // batchModel.status = 1
+                batchModel.qty?.directLoad?.accumulated?.total = commulateTotalNumber
+                batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
+
+                batchModels.add(Pair(fuelBatchRef, batchModel))
+            }
+
+
+            // update batches
+            batchModels.forEach { batchModel ->
+                //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
+
+                // if is public
+                if(!isPrivate){
+                    transaction.update(
+                        batchModel!!.first, "qty.directLoad.accumulated",
+                        batchModel.second!!.qty?.directLoad?.accumulated
+                    )
+                }else {
+                    // if is private
+                }
+
+            }
+
+
+            // update fuel
+            transaction.update(orderRef, "fuel", order?.fuel)
+
+            /*
+           * update seals
+           * */
+            val sealsTemp = OrderSeals(
+                ArrayList(loadingEvent.sealRange?.split("-")!!),
+                ArrayList(loadingEvent.brokenSeal?.split("-")!!)
+            )
+
+            transaction.update(orderRef, "seals", sealsTemp)
+
+            /**
+             * update delivery note number
+             * */
+            transaction.update(
+                orderRef,
+                "deliveryNote",
+                loadingEvent.DeliveryNumber
+            )
+
+            // update user
+            // TODO: the user who updated the batch and fuel
+            firebaseAuth.currentUser?.let {
+                val assocUser =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+                // transaction.update(orderRef, "stagedata.4.user", assocUser)
+            }
+
+            return@runTransaction null
+        }
+    }
+
+
+    private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
+        return if (fuel.entries?.get(1)?.qty!! > 0) {
+            fuel.entries?.get(1)?.observed = observed
+            fuel.entries?.get(1)?.Id!!
+        } else {
+            fuel.entries?.get(0)?.observed = observed
+            fuel.entries?.get(0)?.Id!!
         }
     }
 }

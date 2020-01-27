@@ -576,17 +576,14 @@ class DepotRepository
     }
 
     private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
-
 //        return if (fuel.batches?.get("1")?.qty!! > 0) {
 //            fuel.batches?.get("1")?.observed = observed
-//
 //            fuel.batches?.get("1")?.Id!!
 //        } else {
 //            fuel.batches?.get("0")?.observed = observed
-//
 //            fuel.batches?.get("0")?.Id!!
 //        }
-        return fuel.toString() + observed.toString()
+        return ""
     }
 
 

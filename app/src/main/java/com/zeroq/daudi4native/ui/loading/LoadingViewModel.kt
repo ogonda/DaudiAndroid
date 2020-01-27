@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
+import com.zeroq.daudi4native.data.repository.OmcRepository
 import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.Resource
@@ -16,7 +18,8 @@ import javax.inject.Inject
 class LoadingViewModel @Inject constructor(
     adminRepo: AdminRepository,
     var depotRepository: DepotRepository,
-    var firebaseAuth: FirebaseAuth
+    var firebaseAuth: FirebaseAuth,
+    var omcRepository: OmcRepository
 ) : ViewModel() {
 
     private var _user: LiveData<Resource<UserModel>> = MutableLiveData()
@@ -24,14 +27,30 @@ class LoadingViewModel @Inject constructor(
 
     private val _depotId = MutableLiveData<String>()
 
+    private var _depo: LiveData<Resource<DepotModel>> = MutableLiveData()
+
+    // To trigger components that require user params
+    private var _switchUser = MutableLiveData<UserModel>()
+
     init {
         _user = Transformations.switchMap(_userId, adminRepo::getAdmin)
+        _depo = Transformations.switchMap(_switchUser, depotRepository::getDepot)
 
         _userId.value = firebaseAuth.uid
     }
 
     fun getUser(): LiveData<Resource<UserModel>> {
         return _user
+    }
+
+    fun getDepot(): LiveData<Resource<DepotModel>> {
+        return _depo
+    }
+
+    fun setSwitchUser(user: UserModel) {
+        if (_switchUser.value != user) {
+            _switchUser.value = user
+        }
     }
 
     fun setDepoId(depotid: String) {
@@ -42,11 +61,8 @@ class LoadingViewModel @Inject constructor(
         return depotRepository.updateLoadingExpire(_depotId.value!!, idTruck, minutes)
     }
 
-    fun updateSeals(idTruck: String, loadingEvent: LoadingDialogEvent)
+    fun updateSeals(user: UserModel, loadingEvent: LoadingDialogEvent, orderId: String, depot: DepotModel)
             : CompletionLiveData {
-        return depotRepository.updateSeal(
-            _depotId.value!!,
-            idTruck, loadingEvent, firebaseAuth.currentUser!!
-        )
+        return omcRepository.updateSealAndFuel(user, loadingEvent, orderId, depot)
     }
 }
