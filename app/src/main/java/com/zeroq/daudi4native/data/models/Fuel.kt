@@ -23,18 +23,18 @@ data class TruckEntry(var Name: String?, var Id: String?, var qty: Int?, var obs
 }
 
 data class PriceConfig(
-    var requestedPrice: Number?,
-    var price: Number?,
-    var nonTaxprice: Number?,
-    var nonTax: Number?,
-    var retailprice: Number?,
-    var minsp: Number?,
-    var total: Number?,
-    var taxAmnt: Number?,
-    var nonTaxtotal: Number?,
-    var taxablePrice: Number?,
-    var taxableAmnt: Number?,
-    var difference: Number?
+    var requestedPrice: Int?,
+    var price: Int?,
+    var nonTaxprice: Int?,
+    var nonTax: Int?,
+    var retailprice: Int?,
+    var minsp: Int?,
+    var total: Int?,
+    var taxAmnt: Int?,
+    var nonTaxtotal: Int?,
+    var taxablePrice: Int?,
+    var taxableAmnt: Int?,
+    var difference: Int?
 ) {
     constructor() : this(null, null,
         null, null, null,

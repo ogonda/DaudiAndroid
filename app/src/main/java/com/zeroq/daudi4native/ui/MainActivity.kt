@@ -342,9 +342,8 @@ class MainActivity : BaseActivity() {
 
             // TODO: error here sir, set reminder better
             //  val requestCode = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
-            val requestCode = 200
 
-
+            val requestCode: Int = utils.stripNonDigits(order.QbConfig?.InvoiceId!!)
 
 
             if (order.truck?.stage == 4) {
@@ -365,16 +364,16 @@ class MainActivity : BaseActivity() {
                 1 ->
                     Pair(
                         "Processing",
-                        order.truckStageData?.get("1")?.expiry?.get(0)?.timeCreated!!
+                        order.truckStageData?.get("1")?.expiry?.get(0)?.expiry!!
                     )
                 2 ->
-                    Pair("Queued", order.truckStageData?.get("2")?.expiry?.get(0)?.timeCreated!!)
+                    Pair("Queued", order.truckStageData?.get("2")?.expiry?.get(0)?.expiry!!)
 
                 3 ->
 
-                    Pair("Loading", order.truckStageData?.get("3")?.expiry?.get(0)?.timeCreated!!)
+                    Pair("Loading", order.truckStageData?.get("3")?.expiry?.get(0)?.expiry!!)
                 else ->
-                    Pair("Unknow", Date())
+                    Pair("Unknown", Date())
             }
 
             val title = "Truck ${order.QbConfig?.InvoiceId}"
@@ -382,6 +381,7 @@ class MainActivity : BaseActivity() {
 
             // time difference and then get hours min and sec
 
+            Timber.e("hello son " + stagePair.second)
 
             truckNotification.setReminder(
                 this,

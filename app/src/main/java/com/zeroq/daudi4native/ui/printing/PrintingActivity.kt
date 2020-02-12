@@ -138,7 +138,7 @@ class PrintingActivity : BaseActivity() {
         btn_print?.setOnClickListener(clickEvent())
         btnSearch?.setOnClickListener(clickEvent())
         btnClose?.setOnClickListener(clickEvent())
-        btn_sandbox.setOnClickListener(clickEvent())
+        btnSandbox?.setOnClickListener(clickEvent())
     }
 
     private fun checkBluetoothState() {
@@ -204,7 +204,7 @@ class PrintingActivity : BaseActivity() {
                     }.start()
                 }
 
-                btn_sandbox -> {
+                btnSandbox -> {
                     databasePrintTransactions()
                 }
             }

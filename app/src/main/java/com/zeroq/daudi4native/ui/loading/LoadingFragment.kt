@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.firebase.ui.auth.data.model.User
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.LoadingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
@@ -224,9 +223,9 @@ class LoadingFragment : BaseFragment() {
     }
 
 
-    private fun startLoadingOrderActivity(idTruck: String) {
+    private fun startLoadingOrderActivity(orderId: String) {
         val intent = Intent(activity, LoadingOrderActivity::class.java)
-        intent.putExtra(LoadingOrderActivity.ID_TRUCK_EXTRA, idTruck)
+        intent.putExtra(LoadingOrderActivity.ID_ORDER_EXTRA, orderId)
 
         startActivity(intent)
 
