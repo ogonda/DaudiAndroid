@@ -360,13 +360,8 @@ class TruckDetailActivity : BaseActivity() {
 
     private fun getBatchName(batches: Batches): String? {
         if (!batches.entries.isNullOrEmpty()) {
-            val temp = if (batches.entries!![1].qty != null) {
-                batches.entries!![1].Name
-            } else {
-                batches.entries!![0].Name
-            }
-
-            return temp ?: "****************"
+            val entrySize = batches.entries!!.size
+            return batches.entries!![entrySize - 1].Name
         } else {
             return "****************"
         }

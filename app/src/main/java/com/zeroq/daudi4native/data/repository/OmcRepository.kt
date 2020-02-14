@@ -1,7 +1,6 @@
 package com.zeroq.daudi4native.data.repository
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.zeroq.daudi4native.data.models.*
@@ -267,16 +266,22 @@ class OmcRepository @Inject constructor(
              * set expirely and the user
              * */
             firebaseAuth.currentUser?.let {
-                val setbyExpire =
+                val assocUser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+                val expireObj = Expiry(startDate, expireDate, assocUser)
 
                 val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
                 exp?.add(0, expireObj)
 
                 // commit to fireStore
                 transaction.update(orderRef, "truckStageData.2.expiry", exp)
+
+                // user who moved the truck to this stage
+                transaction.update(orderRef, "truckStageData.2.user", assocUser)
+
+                // user who moved the the order.
+                transaction.update(orderRef, "orderStageData.2.user", assocUser)
 
                 // change stage to queueing
                 transaction.update(orderRef, "truck.stage", 2)
@@ -385,16 +390,22 @@ class OmcRepository @Inject constructor(
              * set expirely and the user
              * */
             firebaseAuth.currentUser?.let {
-                val setbyExpire =
+                val associatedUser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+                val expireObj = Expiry(startDate, expireDate, associatedUser)
 
                 val exp: ArrayList<Expiry>? = order?.truckStageData!!["3"]?.expiry
                 exp?.add(0, expireObj)
 
                 // commit to fireStore
                 transaction.update(orderRef, "truckStageData.3.expiry", exp)
+
+                // user who moved the truck to this stage
+                transaction.update(orderRef, "truckStageData.3.user", associatedUser)
+
+                // user who moved the the order.
+                transaction.update(orderRef, "orderStageData.3.user", associatedUser)
 
                 // change stage to queueing
                 transaction.update(orderRef, "truck.stage", 3)
@@ -461,76 +472,72 @@ class OmcRepository @Inject constructor(
 
 
             // store batch models
-            val batchModels: ArrayList<Pair<DocumentReference, EntryModel?>?> = ArrayList()
+//            val batchModels: ArrayList<Pair<DocumentReference, EntryModel?>?> = ArrayList()
 
-            updateFuelBatch.forEach { pair ->
-
-                val fuelBatchRef = omc
-                    .document(userModel.config?.omcId!!)
-                    .collection("entries")
-                    .document(pair.first)
-
-                val batchModel = transaction.get(fuelBatchRef).toObject(EntryModel::class.java)
-
-                val commulateTotalNumber =
-                    batchModel?.qty?.directLoad?.accumulated?.total!!.plus(pair.second)
-                val commulateUsableNumber =
-                    batchModel.qty?.directLoad?.accumulated?.usable!!.plus(pair.second)
-
-
-                // batchModel.status = 1
-                batchModel.qty?.directLoad?.accumulated?.total = commulateTotalNumber
-                batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
-
-                batchModels.add(Pair(fuelBatchRef, batchModel))
-            }
-
-
-            // update batches
-            batchModels.forEach { batchModel ->
-                //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
-
-                // if is public
-                if(!isPrivate){
-                    transaction.update(
-                        batchModel!!.first, "qty.directLoad.accumulated",
-                        batchModel.second!!.qty?.directLoad?.accumulated
-                    )
-                }else {
-                    // if is private
-                }
-
-            }
+//            updateFuelBatch.forEach { pair ->
+//
+//                val fuelBatchRef = omc
+//                    .document(userModel.config?.omcId!!)
+//                    .collection("entries")
+//                    .document(pair.first)
+//
+//                val batchModel = transaction.get(fuelBatchRef).toObject(EntryModel::class.java)
+//
+//                val commulateTotalNumber =
+//                    batchModel?.qty?.directLoad?.accumulated?.total!!.plus(pair.second)
+//                val commulateUsableNumber =
+//                    batchModel.qty?.directLoad?.accumulated?.usable!!.plus(pair.second)
+//
+//
+//                // batchModel.status = 1
+//                batchModel.qty?.directLoad?.accumulated?.total = commulateTotalNumber
+//                batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
+//
+//                batchModels.add(Pair(fuelBatchRef, batchModel))
+//            }
+//
+//
+//            // update batches
+//            batchModels.forEach { batchModel ->
+//                //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
+//
+//                // if is public
+//                    transaction.update(
+//                        batchModel!!.first, "qty.directLoad.accumulated",
+//                        batchModel.second!!.qty?.directLoad?.accumulated
+//                    )
+//
+//            }
 
 
             // update fuel
             transaction.update(orderRef, "fuel", order?.fuel)
 
             /*
-           * update seals
+           * update seals with user
            * */
-            val sealsTemp = OrderSeals(
-                ArrayList(loadingEvent.sealRange?.split("-")!!),
-                ArrayList(loadingEvent.brokenSeal?.split("-")!!)
-            )
-
-            transaction.update(orderRef, "seals", sealsTemp)
-
-            /**
-             * update delivery note number
-             * */
-            transaction.update(
-                orderRef,
-                "deliveryNote",
-                loadingEvent.DeliveryNumber
-            )
-
-            // update user
-            // TODO: the user who updated the batch and fuel
             firebaseAuth.currentUser?.let {
                 val assocUser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
-                // transaction.update(orderRef, "stagedata.4.user", assocUser)
+
+                val sealsTemp = OrderSeals(
+                    ArrayList(loadingEvent.sealRange?.split("-")!!),
+                    ArrayList(loadingEvent.brokenSeal?.split("-")!!),
+                    assocUser
+                )
+
+                transaction.update(orderRef, "seals", sealsTemp)
+
+                /**
+                 * update delivery note number
+                 * */
+                val deliveryNote = DeliveryNote(loadingEvent.DeliveryNumber)
+
+                transaction.update(
+                    orderRef,
+                    "deliveryNote",
+                    deliveryNote
+                )
             }
 
             return@runTransaction null
@@ -539,12 +546,9 @@ class OmcRepository @Inject constructor(
 
 
     private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
-        return if (fuel.entries?.get(1)?.qty!! > 0) {
-            fuel.entries?.get(1)?.observed = observed
-            fuel.entries?.get(1)?.Id!!
-        } else {
-            fuel.entries?.get(0)?.observed = observed
-            fuel.entries?.get(0)?.Id!!
-        }
+        val position = fuel.entries!!.size - 1
+
+        fuel.entries!![position].observed = observed
+        return fuel.entries!![position].Id!!
     }
 }

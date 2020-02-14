@@ -381,8 +381,6 @@ class MainActivity : BaseActivity() {
 
             // time difference and then get hours min and sec
 
-            Timber.e("hello son " + stagePair.second)
-
             truckNotification.setReminder(
                 this,
                 TruckExpireBroadCast::class.java,
