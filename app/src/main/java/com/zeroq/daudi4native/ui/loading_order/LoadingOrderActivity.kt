@@ -16,9 +16,10 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.data.models.DepotModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.data.models.UserModel
-import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
 import com.zeroq.daudi4native.utils.ImageUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,10 +45,12 @@ class LoadingOrderActivity : BaseActivity() {
     lateinit var activityUtil: ActivityUtil
 
     lateinit var _user: UserModel
-    lateinit var liveTruck: TruckModel
+    lateinit var liveOrder: OrderModel
+    private var depot: DepotModel? = null
+
 
     companion object {
-        const val ID_TRUCK_EXTRA = "IDTRUCK"
+        const val ID_ORDER_EXTRA = "ORDERID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,10 +64,10 @@ class LoadingOrderActivity : BaseActivity() {
         setUpToolbar()
         viewModel = getViewModel(LoadingOrderViewModel::class.java)
 
-        if (intent.hasExtra(ID_TRUCK_EXTRA)) {
-            val idTruck = intent.getStringExtra(ID_TRUCK_EXTRA)
+        if (intent.hasExtra(ID_ORDER_EXTRA)) {
+            val idTruck = intent.getStringExtra(ID_ORDER_EXTRA)
             idTruck?.let {
-                viewModel.setTruckId(idTruck)
+                viewModel.setOrderId(idTruck)
             }
         }
 
@@ -91,6 +94,7 @@ class LoadingOrderActivity : BaseActivity() {
         viewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
                 _user = it.data()!!
+                viewModel.setSwitchUser(_user)
                 viewModel.setDepotId(_user.config?.app?.depotid.toString())
             } else {
                 Timber.e(it.error()!!)
@@ -99,11 +103,12 @@ class LoadingOrderActivity : BaseActivity() {
 
         viewModel.getDepot().observe(this, Observer {
             if (it.isSuccessful) {
-
+                depot = it.data()
                 it.data()?.let { depo ->
                     tv_depot_name.text = "[ ${depo.Name} ]"
                 }
             } else {
+                depot = null
                 Timber.e(it.error())
             }
         })
@@ -134,10 +139,10 @@ class LoadingOrderActivity : BaseActivity() {
             })
         }
 
-        viewModel.getTruck().observe(this, Observer {
+        viewModel.getOrder().observe(this, Observer {
             if (it.isSuccessful) {
-                liveTruck = it.data()!!
-                initialTruckValues(it.data()!!)
+                liveOrder = it.data()!!
+                initialOrderValues(it.data()!!)
 
             } else {
                 Timber.e(it.error())
@@ -146,36 +151,36 @@ class LoadingOrderActivity : BaseActivity() {
 
     }
 
-    private fun initialTruckValues(truck: TruckModel) {
+    private fun initialOrderValues(orderModel: OrderModel) {
 
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm aaa")
         tv_today_date.text = sdf.format(Date()).toUpperCase()
 
 
-        tv_truck_id.text = truck.truckId
+        tv_truck_id.text = orderModel.QbConfig?.InvoiceId
 
         // driver data
-        tv_driver_value.text = truck.drivername
-        tv_driver_passport_value.text = truck.driverid
-        tv_number_plate_value.text = truck.numberplate
-        tv_organisation_value.text = truck.company?.name
+        tv_driver_value.text = orderModel.truck?.driverdetail?.name
+        tv_driver_passport_value.text = orderModel.truck?.driverdetail?.id
+        tv_number_plate_value.text = orderModel.truck?.truckdetail?.numberplate
+        tv_organisation_value.text = orderModel.customer?.name
 
         // inputs
-        val data = truck.stagedata?.get("4")?.data
-        et_delivery_note.setText(data?.deliveryNote)
-        et_seal.setText(data?.seals?.range)
-        val broken = data?.seals?.broken?.joinToString("-")
-        et_broken_seals.setText(broken)
+        val seals = orderModel.seals
+        // TODO: get delivery number from
+//        et_delivery_note.setText(seals?.deliveryNote)
+        et_seal.setText(seals?.range?.joinToString("-"))
+        et_broken_seals.setText(seals?.broken?.joinToString("-"))
 
 
         // fuel
-        tv_pms_value.text = truck.fuel?.pms?.qty.toString()
-        tv_ago_value.text = truck.fuel?.ago?.qty.toString()
-        tv_ik_value.text = truck.fuel?.ik?.qty.toString()
+        tv_pms_value.text = orderModel.fuel?.pms?.qty.toString()
+        tv_ago_value.text = orderModel.fuel?.ago?.qty.toString()
+        tv_ik_value.text = orderModel.fuel?.ik?.qty.toString()
 
         // qr
         val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${truck.truckId}"
+            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${orderModel.QbConfig?.InvoiceId}"
 
         val dimensions = imageUtil.dpToPx(this, 150)
 

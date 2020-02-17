@@ -71,14 +71,13 @@
                     android:text="@string/close">
             </Button>
             <Button
-                    android:id="@+id/btn_sandbox"
+                    android:id="@+id/btnSandbox"
                     android:layout_marginLeft="50dp"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="50dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/test_print"
-                    android:visibility="gone">
+                    android:text="@string/test_print">
             </Button>
 
         </LinearLayout>

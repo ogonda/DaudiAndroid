@@ -20,7 +20,6 @@ class TruckDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var _user: LiveData<Resource<UserModel>> = MutableLiveData()
-    private var _truck: LiveData<Resource<TruckModel>> = MutableLiveData()
 
     private var _order: LiveData<Resource<OrderModel>> = MutableLiveData()
 

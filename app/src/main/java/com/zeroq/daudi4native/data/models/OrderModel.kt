@@ -11,14 +11,19 @@ data class OrderModel(
     var printStatus: PrintingStatus?,
     var truckStageData: Map<String, TruckStageData>?,
     var truck: Truck?,
-    var fuel: Fuel?
+    var fuel: Fuel?,
+    var deliveryNote: DeliveryNote?
 
 ) : Model() {
     constructor() : this(
         null, null, null,
         null, null, null, null,
-        null, null, null
+        null, null, null, null
     )
+}
+
+data class DeliveryNote(var value: String?){
+    constructor(): this(null)
 }
 
 data class QbConfig(var InvoiceId: String?) {
