@@ -104,16 +104,46 @@ class OmcRepository @Inject constructor(
              * set expirely and the user
              * */
             firebaseAuth.currentUser?.let {
-                val setbyExpire =
+                val assocUser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
-                val expireObj = Expiry(startDate, expireDate, setbyExpire)
+                val expireObj = Expiry(startDate, expireDate, assocUser)
 
                 val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
                 exp?.add(0, expireObj)
 
                 // commit to fireStore
                 transaction.update(orderRef, "truckStageData.1.expiry", exp)
+
+
+                // calculate the other values
+                val Additions = exp!!.size
+
+                val totalApproxTime =
+                    order.truckStageData!!["1"]?.totalApproxTime!!
+                +(expireDate.time - startDate.time)
+
+                /*
+                * should be updated on the next stage also.
+                * when pushing to the next stage
+                *
+                * - if array size is bigger than 2,  take start time and expire of the previous expire.
+                * */
+                val totalExpiredTimeTemp = if (exp.size >= 2) {
+                    exp[0].timeCreated!!.time - exp[1].timeCreated!!.time
+                } else {
+                    0
+                }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["1"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+
+                // commit all these changes
+                transaction.update(orderRef, "truckStageData.1.Additions", Additions)
+                transaction.update(orderRef, "truckStageData.1.totalExpiredTime", totalExpiredTime)
+                transaction.update(orderRef, "truckStageData.1.totalApproxTime", totalApproxTime)
+
             }
 
             return@runTransaction null
@@ -285,13 +315,30 @@ class OmcRepository @Inject constructor(
 
                 // change stage to queueing
                 transaction.update(orderRef, "truck.stage", 2)
+
+
+                /*
+                * calculate the totalExpiredTime
+                * */
+                val totalExpiredTimeTemp =
+                    if (exp!![0].timeCreated!!.time > order.truckStageData!!["1"]?.expiry!![0].expiry!!.time) {
+                        exp[0].timeCreated!!.time - exp[1].timeCreated!!.time
+                    } else {
+                        0
+                    }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["1"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+                /*
+                * will add time to the total expired time.
+                * */
+                transaction.update(orderRef, "truckStageData.1.totalExpiredTime", totalExpiredTime)
             }
 
             return@runTransaction null
-
         }
     }
-
 
     /*
     * update processing expire time
@@ -347,6 +394,34 @@ class OmcRepository @Inject constructor(
 
                 // commit to fireStore
                 transaction.update(orderRef, "truckStageData.2.expiry", exp)
+
+
+                // calculate the other values
+                val Additions = exp!!.size
+
+                val totalApproxTime =
+                    order.truckStageData!!["2"]?.totalApproxTime!! + (expireDate.time - startDate.time)
+
+                /*
+                * should be updated on the next stage also.
+                * when pushing to the next stage
+                *
+                * - if array size is bigger than 2,  take start time and expire of the previous expire.
+                * */
+                val totalExpiredTimeTemp = if (exp.size >= 2) {
+                    exp[0].timeCreated!!.time - exp[1].timeCreated!!.time
+                } else {
+                    0
+                }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["2"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+
+                // commit all these changes
+                transaction.update(orderRef, "truckStageData.2.Additions", Additions)
+                transaction.update(orderRef, "truckStageData.2.totalExpiredTime", totalExpiredTime)
+                transaction.update(orderRef, "truckStageData.2.totalApproxTime", totalApproxTime)
             }
 
             return@runTransaction null
@@ -409,6 +484,25 @@ class OmcRepository @Inject constructor(
 
                 // change stage to queueing
                 transaction.update(orderRef, "truck.stage", 3)
+
+
+                /*
+               * calculate the totalExpiredTime
+               * */
+                val totalExpiredTimeTemp =
+                    if (exp!![0].timeCreated!!.time > order.truckStageData!!["2"]?.expiry!![0].expiry!!.time) {
+                        exp[0].timeCreated!!.time - order.truckStageData!!["2"]?.expiry!![0].expiry!!.time
+                    } else {
+                        0
+                    }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["2"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+                /*
+                * will add time to the total expired time.
+                * */
+                transaction.update(orderRef, "truckStageData.2.totalExpiredTime", totalExpiredTime)
             }
 
             return@runTransaction null
@@ -469,45 +563,6 @@ class OmcRepository @Inject constructor(
                     updateFuelBatch.add(Pair(fuelId, obLost))
                 }
             }
-
-
-            // store batch models
-//            val batchModels: ArrayList<Pair<DocumentReference, EntryModel?>?> = ArrayList()
-
-//            updateFuelBatch.forEach { pair ->
-//
-//                val fuelBatchRef = omc
-//                    .document(userModel.config?.omcId!!)
-//                    .collection("entries")
-//                    .document(pair.first)
-//
-//                val batchModel = transaction.get(fuelBatchRef).toObject(EntryModel::class.java)
-//
-//                val commulateTotalNumber =
-//                    batchModel?.qty?.directLoad?.accumulated?.total!!.plus(pair.second)
-//                val commulateUsableNumber =
-//                    batchModel.qty?.directLoad?.accumulated?.usable!!.plus(pair.second)
-//
-//
-//                // batchModel.status = 1
-//                batchModel.qty?.directLoad?.accumulated?.total = commulateTotalNumber
-//                batchModel.qty?.directLoad?.accumulated?.usable = commulateUsableNumber
-//
-//                batchModels.add(Pair(fuelBatchRef, batchModel))
-//            }
-//
-//
-//            // update batches
-//            batchModels.forEach { batchModel ->
-//                //transaction.update(batchModel!!.first, "status", batchModel.second!!.status)
-//
-//                // if is public
-//                    transaction.update(
-//                        batchModel!!.first, "qty.directLoad.accumulated",
-//                        batchModel.second!!.qty?.directLoad?.accumulated
-//                    )
-//
-//            }
 
 
             // update fuel
