@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.data.models.DepotModel
+import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
@@ -57,12 +58,16 @@ class LoadingViewModel @Inject constructor(
         if (depotid != _depotId.value) _depotId.value = depotid
     }
 
-    fun updateExpire(idTruck: String, minutes: Long): CompletionLiveData {
-        return depotRepository.updateLoadingExpire(_depotId.value!!, idTruck, minutes)
+    fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
+        return omcRepository.updateTruckExpiry(user, order, minutes, 3)
     }
 
-    fun updateSeals(user: UserModel, loadingEvent: LoadingDialogEvent, orderId: String, depot: DepotModel)
-            : CompletionLiveData {
+    fun updateSeals(
+        user: UserModel,
+        loadingEvent: LoadingDialogEvent,
+        orderId: String,
+        depot: DepotModel
+    ): CompletionLiveData {
         return omcRepository.updateSealAndFuel(user, loadingEvent, orderId, depot)
     }
 }

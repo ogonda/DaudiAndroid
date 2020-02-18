@@ -167,17 +167,19 @@ class LoadingFragment : BaseFragment() {
 
         val expireDialog = TimeDialogFragment("Enter Additional Time", order)
         expireSub = expireDialog.timeEvent.subscribe {
-            viewModel.updateExpire(it.order.Id!!, it.minutes.toLong())
-                .observe(this, Observer { result ->
-                    if (!result.isSuccessful) {
-                        Toast.makeText(
-                            activity,
-                            "Error occurred when adding expire", Toast.LENGTH_SHORT
-                        ).show()
+            userModel?.let { u ->
+                viewModel.updateExpire(u, order, it.minutes.toLong())
+                    .observe(this, Observer { state ->
+                        if (!state.isSuccessful) {
+                            Toast.makeText(
+                                activity,
+                                "Error occurred when adding expire", Toast.LENGTH_SHORT
+                            ).show()
 
-                        Timber.e(result.error())
-                    }
-                })
+                            Timber.e(state.error())
+                        }
+                    })
+            }
         }
 
         expireDialog.show(fragmentManager!!, _TAG)

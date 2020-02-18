@@ -41,7 +41,7 @@ class QueuedViewModel @Inject constructor(
     }
 
     fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
-        return omcRepository.updateQueueExpire(user, order, minutes)
+        return omcRepository.updateTruckExpiry(user, order, minutes, 2)
     }
 
 
