@@ -230,6 +230,5 @@ class LoadingFragment : BaseFragment() {
         intent.putExtra(LoadingOrderActivity.ID_ORDER_EXTRA, orderId)
 
         startActivity(intent)
-
     }
 }

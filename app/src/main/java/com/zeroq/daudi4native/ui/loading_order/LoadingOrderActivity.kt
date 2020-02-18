@@ -20,6 +20,7 @@ import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
 import com.zeroq.daudi4native.utils.ImageUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -167,8 +168,9 @@ class LoadingOrderActivity : BaseActivity() {
 
         // inputs
         val seals = orderModel.seals
-        // TODO: get delivery number from
-//        et_delivery_note.setText(seals?.deliveryNote)
+
+
+        et_delivery_note.setText(orderModel?.deliveryNote?.value)
         et_seal.setText(seals?.range?.joinToString("-"))
         et_broken_seals.setText(seals?.broken?.joinToString("-"))
 
@@ -241,7 +243,9 @@ class LoadingOrderActivity : BaseActivity() {
         progressDialog.show()
 
         viewModel.updateSeals(
-            et_seal.text.toString(), et_broken_seals.text.toString(),
+            _user, liveOrder.Id!!,
+            et_seal.text.toString(),
+            et_broken_seals.text.toString(),
             et_delivery_note.text.toString()
         ).observe(this, Observer {
             if (it.isSuccessful) {
@@ -274,11 +278,7 @@ class LoadingOrderActivity : BaseActivity() {
 
                 if (it) {
                     hideButton(false)
-//                    PrintingActivity.startPrintingActivity(
-//                        this,
-//                        _user.config?.app?.depotid.toString(), liveTruck.Id!!,
-//                        "3"
-//                    )
+                    PrintingActivity.startPrintingActivity(this, liveOrder.Id!!, "3")
                 } else {
                     hideButton(false)
                     toast("Sorry an error occurred")

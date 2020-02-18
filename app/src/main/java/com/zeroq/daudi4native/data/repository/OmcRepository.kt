@@ -258,6 +258,11 @@ class OmcRepository @Inject constructor(
 
         return firestore.runTransaction { transaction ->
 
+            val order: OrderModel? = transaction
+                .get(orderRef)
+                .toObject(OrderModel::class.java)
+
+
             firebaseAuth.currentUser?.let {
                 val assocuser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
@@ -265,6 +270,24 @@ class OmcRepository @Inject constructor(
                 val p = Printing(true, assocuser)
 
                 transaction.update(orderRef, "printStatus.gatepass", p)
+
+                transaction.update(orderRef, "truck.stage", 4)
+
+
+                val totalExpiredTimeTemp =
+                    if (Calendar.getInstance().time.time > order!!.truckStageData!!["1"]?.expiry!![0].expiry!!.time) {
+                        Calendar.getInstance().time.time - order.truckStageData!!["1"]?.expiry!![0].expiry!!.time
+                    } else {
+                        0
+                    }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["3"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+                /*
+                * will add time to the total expired time.
+                * */
+                transaction.update(orderRef, "truckStageData.3.totalExpiredTime", totalExpiredTime)
             }
 
             return@runTransaction null
@@ -349,7 +372,7 @@ class OmcRepository @Inject constructor(
             return@runTransaction null
         }
     }
-    
+
 
     fun pushToLoading(user: UserModel, orderId: String, minutes: Long):
             CompletionLiveData {
@@ -526,5 +549,66 @@ class OmcRepository @Inject constructor(
 
         fuel.entries!![position].observed = observed
         return fuel.entries!![position].Id!!
+    }
+
+
+    // update seals and delivery note number
+    fun updateSealInfo(
+        userModel: UserModel,
+        orderId: String,
+        sealRange: String,
+        brokenSeals: String,
+        delivery: String
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updateSealInfoTask(
+            userModel,
+            orderId,
+            sealRange,
+            brokenSeals,
+            delivery
+        ).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+
+    private fun updateSealInfoTask(
+        userModel: UserModel, orderId: String,
+        sealRange: String,
+        brokenSeals: String,
+        delivery: String
+    ): Task<Void> {
+        val orderRef = omc.document(userModel.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+            firebaseAuth.currentUser?.let {
+                val assocUser =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val sealsTemp = OrderSeals(
+                    ArrayList(sealRange.split("-")),
+                    ArrayList(brokenSeals.split("-")),
+                    assocUser
+                )
+
+                transaction.update(orderRef, "seals", sealsTemp)
+
+                /**
+                 * update delivery note number
+                 * */
+                val deliveryNote = DeliveryNote(delivery)
+
+                transaction.update(
+                    orderRef,
+                    "deliveryNote",
+                    deliveryNote
+                )
+            }
+
+            return@runTransaction null
+        }
     }
 }

@@ -20,7 +20,7 @@ import javax.inject.Inject
 class LoadingOrderViewModel @Inject constructor(
     adminRepo: AdminRepository,
     var depotRepository: DepotRepository,
-    firebaseAuth: FirebaseAuth,
+    var firebaseAuth: FirebaseAuth,
     var omcRepository: OmcRepository
 ) : ViewModel() {
 
@@ -78,12 +78,10 @@ class LoadingOrderViewModel @Inject constructor(
     }
 
     fun updateSeals(
-        sealRange: String, brokenSeals: String, delivery: String
+        user: UserModel, orderId: String, sealRange: String, brokenSeals: String, delivery: String
     ): CompletionLiveData {
-        return depotRepository.updateSealInfo(
-            _depotId.value!!,
-            "",
-            sealRange, brokenSeals, delivery
+        return omcRepository.updateSealInfo(
+            user, orderId, sealRange, brokenSeals, delivery
         )
     }
 
