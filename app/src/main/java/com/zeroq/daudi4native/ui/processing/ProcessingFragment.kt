@@ -28,6 +28,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class ProcessingFragment : BaseFragment() {
@@ -121,7 +122,12 @@ class ProcessingFragment : BaseFragment() {
         val clickSub: Disposable = adapter.expireTvClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                expireTimePicker(it.order)
+                val now = Calendar.getInstance();
+
+                if (it.order.truckStageData!!["1"]?.expiry!![0].expiry!!.before(now.time)) {
+                    expireTimePicker(it.order)
+                }
+
             }
 
 
@@ -130,8 +136,6 @@ class ProcessingFragment : BaseFragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 val printed = it?.order?.printStatus?.LoadingOrder?.status
-
-                Timber.d("" + printed)
 
                 if (printed != null || printed == true) {
                     queueTruckDialog(it.order)

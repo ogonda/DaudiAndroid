@@ -18,7 +18,7 @@ data class Batches(
     constructor() : this(0, null, null, null)
 }
 
-data class TruckEntry(var Name: String?, var Id: String?, var qty: Int?, var observed: Int?) {
+data class TruckEntry(var name: String?, var id: String?, var qty: Int?, var observed: Int?) {
     constructor() : this(null, null, null, null)
 }
 

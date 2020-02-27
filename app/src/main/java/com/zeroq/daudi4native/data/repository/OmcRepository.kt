@@ -492,25 +492,22 @@ class OmcRepository @Inject constructor(
                 Triple("ik", order?.fuel?.ik, loadingEvent.ikLoaded)
             )
 
-            val updateFuelBatch: ArrayList<Pair<String, Int>> = ArrayList()
 
             fuels.forEach { triple ->
                 val bQuantity = triple.second?.qty
 
                 if (bQuantity != null && bQuantity > 0) {
-                    Timber.e(triple.third.toString())
+                    val updated: Batches = mutateFuelObservered(triple.second!!, triple.third)
 
-                    val fuelId = mutateFuelObservered(triple.second!!, triple.third)
-
-                    val obLost = bQuantity.minus(triple.third!!)
-
-                    updateFuelBatch.add(Pair(fuelId, obLost))
+                    // update fuel
+                    transaction.update(
+                        orderRef,
+                        "fuel.${triple.first}.entries",
+                        updated.entries
+                    )
                 }
             }
 
-
-            // update fuel
-            transaction.update(orderRef, "fuel", order?.fuel)
 
             /*
            * update seals with user
@@ -544,11 +541,11 @@ class OmcRepository @Inject constructor(
     }
 
 
-    private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
+    private fun mutateFuelObservered(fuel: Batches, observed: Int?): Batches {
         val position = fuel.entries!!.size - 1
 
         fuel.entries!![position].observed = observed
-        return fuel.entries!![position].Id!!
+        return fuel;
     }
 
 
