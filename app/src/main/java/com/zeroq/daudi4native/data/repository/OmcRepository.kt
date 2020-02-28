@@ -57,16 +57,18 @@ class OmcRepository @Inject constructor(
             .whereLessThan("truck.stage", 4)
     }
 
+
     /*
-    * update processing expire time
+    * update expire time
     * */
-    fun updateProcessingExpire(
+    fun updateTruckExpiry(
         user: UserModel,
         order: OrderModel,
-        minutes: Long
+        minutes: Long,
+        stage: Int
     ): CompletionLiveData {
         val completion = CompletionLiveData()
-        updateProcessingExpireTask(user, order, minutes).addOnCompleteListener(completion)
+        updateProcessingExpireTask(user, order, minutes, stage).addOnCompleteListener(completion)
 
         return completion
     }
@@ -75,7 +77,8 @@ class OmcRepository @Inject constructor(
     private fun updateProcessingExpireTask(
         user: UserModel,
         orderData: OrderModel,
-        minutes: Long
+        minutes: Long,
+        stage: Int
     ): Task<Void> {
 
 
@@ -109,19 +112,18 @@ class OmcRepository @Inject constructor(
 
                 val expireObj = Expiry(startDate, expireDate, assocUser)
 
-                val exp: ArrayList<Expiry>? = order?.truckStageData!!["1"]?.expiry
+                val exp: ArrayList<Expiry>? = order?.truckStageData!!["$stage"]?.expiry
                 exp?.add(0, expireObj)
 
                 // commit to fireStore
-                transaction.update(orderRef, "truckStageData.1.expiry", exp)
+                transaction.update(orderRef, "truckStageData.$stage.expiry", exp)
 
 
                 // calculate the other values
                 val Additions = exp!!.size
 
                 val totalApproxTime =
-                    order.truckStageData!!["1"]?.totalApproxTime!!
-                +(expireDate.time - startDate.time)
+                    order.truckStageData!!["$stage"]?.totalApproxTime!! + (expireDate.time - startDate.time)
 
                 /*
                 * should be updated on the next stage also.
@@ -130,19 +132,27 @@ class OmcRepository @Inject constructor(
                 * - if array size is bigger than 2,  take start time and expire of the previous expire.
                 * */
                 val totalExpiredTimeTemp = if (exp.size >= 2) {
-                    exp[0].timeCreated!!.time - exp[1].timeCreated!!.time
+                    exp[0].timeCreated!!.time - exp[stage].timeCreated!!.time
                 } else {
                     0
                 }
 
                 val totalExpiredTime =
-                    order.truckStageData!!["1"]?.totalExpiredTime!! + totalExpiredTimeTemp
+                    order.truckStageData!!["$stage"]?.totalExpiredTime!! + totalExpiredTimeTemp
 
 
                 // commit all these changes
-                transaction.update(orderRef, "truckStageData.1.Additions", Additions)
-                transaction.update(orderRef, "truckStageData.1.totalExpiredTime", totalExpiredTime)
-                transaction.update(orderRef, "truckStageData.1.totalApproxTime", totalApproxTime)
+                transaction.update(orderRef, "truckStageData.$stage.Additions", Additions)
+                transaction.update(
+                    orderRef,
+                    "truckStageData.$stage.totalExpiredTime",
+                    totalExpiredTime
+                )
+                transaction.update(
+                    orderRef,
+                    "truckStageData.$stage.totalApproxTime",
+                    totalApproxTime
+                )
 
             }
 
@@ -248,6 +258,11 @@ class OmcRepository @Inject constructor(
 
         return firestore.runTransaction { transaction ->
 
+            val order: OrderModel? = transaction
+                .get(orderRef)
+                .toObject(OrderModel::class.java)
+
+
             firebaseAuth.currentUser?.let {
                 val assocuser =
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
@@ -255,6 +270,24 @@ class OmcRepository @Inject constructor(
                 val p = Printing(true, assocuser)
 
                 transaction.update(orderRef, "printStatus.gatepass", p)
+
+                transaction.update(orderRef, "truck.stage", 4)
+
+
+                val totalExpiredTimeTemp =
+                    if (Calendar.getInstance().time.time > order!!.truckStageData!!["1"]?.expiry!![0].expiry!!.time) {
+                        Calendar.getInstance().time.time - order.truckStageData!!["1"]?.expiry!![0].expiry!!.time
+                    } else {
+                        0
+                    }
+
+                val totalExpiredTime =
+                    order.truckStageData!!["3"]?.totalExpiredTime!! + totalExpiredTimeTemp
+
+                /*
+                * will add time to the total expired time.
+                * */
+                transaction.update(orderRef, "truckStageData.3.totalExpiredTime", totalExpiredTime)
             }
 
             return@runTransaction null
@@ -338,95 +371,6 @@ class OmcRepository @Inject constructor(
 
             return@runTransaction null
         }
-    }
-
-    /*
-    * update processing expire time
-    * */
-    fun updateQueueExpire(
-        user: UserModel,
-        order: OrderModel,
-        minutes: Long
-    ): CompletionLiveData {
-        val completion = CompletionLiveData()
-        updateQueueExpireTask(user, order, minutes).addOnCompleteListener(completion)
-        return completion
-    }
-
-
-    private fun updateQueueExpireTask(
-        user: UserModel,
-        orderData: OrderModel,
-        minutes: Long
-    ): Task<Void> {
-        /*
-        * omc id will be from the user config for more security
-        * */
-        val orderRef = omc.document(user.config?.omcId!!)
-            .collection("orders")
-            .document(orderData.Id!!)
-
-
-        return firestore.runTransaction { transaction: Transaction ->
-            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
-
-            // add new time
-            val startDate = Calendar.getInstance().time
-
-            val calendar = Calendar.getInstance()
-            calendar.time = startDate
-            calendar.add(Calendar.MINUTE, minutes.toInt())
-
-            val expireDate = calendar.time
-
-            /**
-             *
-             * set expirely and the user
-             * */
-            firebaseAuth.currentUser?.let {
-                val setbyExpire =
-                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
-
-                val expireObj = Expiry(startDate, expireDate, setbyExpire)
-
-                val exp: ArrayList<Expiry>? = order?.truckStageData!!["2"]?.expiry
-                exp?.add(0, expireObj)
-
-                // commit to fireStore
-                transaction.update(orderRef, "truckStageData.2.expiry", exp)
-
-
-                // calculate the other values
-                val Additions = exp!!.size
-
-                val totalApproxTime =
-                    order.truckStageData!!["2"]?.totalApproxTime!! + (expireDate.time - startDate.time)
-
-                /*
-                * should be updated on the next stage also.
-                * when pushing to the next stage
-                *
-                * - if array size is bigger than 2,  take start time and expire of the previous expire.
-                * */
-                val totalExpiredTimeTemp = if (exp.size >= 2) {
-                    exp[0].timeCreated!!.time - exp[1].timeCreated!!.time
-                } else {
-                    0
-                }
-
-                val totalExpiredTime =
-                    order.truckStageData!!["2"]?.totalExpiredTime!! + totalExpiredTimeTemp
-
-
-                // commit all these changes
-                transaction.update(orderRef, "truckStageData.2.Additions", Additions)
-                transaction.update(orderRef, "truckStageData.2.totalExpiredTime", totalExpiredTime)
-                transaction.update(orderRef, "truckStageData.2.totalApproxTime", totalApproxTime)
-            }
-
-            return@runTransaction null
-        }
-
     }
 
 
@@ -548,25 +492,22 @@ class OmcRepository @Inject constructor(
                 Triple("ik", order?.fuel?.ik, loadingEvent.ikLoaded)
             )
 
-            val updateFuelBatch: ArrayList<Pair<String, Int>> = ArrayList()
 
             fuels.forEach { triple ->
                 val bQuantity = triple.second?.qty
 
                 if (bQuantity != null && bQuantity > 0) {
-                    Timber.e(triple.third.toString())
+                    val updated: Batches = mutateFuelObservered(triple.second!!, triple.third)
 
-                    val fuelId = mutateFuelObservered(triple.second!!, triple.third)
-
-                    val obLost = bQuantity.minus(triple.third!!)
-
-                    updateFuelBatch.add(Pair(fuelId, obLost))
+                    // update fuel
+                    transaction.update(
+                        orderRef,
+                        "fuel.${triple.first}.entries",
+                        updated.entries
+                    )
                 }
             }
 
-
-            // update fuel
-            transaction.update(orderRef, "fuel", order?.fuel)
 
             /*
            * update seals with user
@@ -600,10 +541,71 @@ class OmcRepository @Inject constructor(
     }
 
 
-    private fun mutateFuelObservered(fuel: Batches, observed: Int?): String {
+    private fun mutateFuelObservered(fuel: Batches, observed: Int?): Batches {
         val position = fuel.entries!!.size - 1
 
         fuel.entries!![position].observed = observed
-        return fuel.entries!![position].Id!!
+        return fuel;
+    }
+
+
+    // update seals and delivery note number
+    fun updateSealInfo(
+        userModel: UserModel,
+        orderId: String,
+        sealRange: String,
+        brokenSeals: String,
+        delivery: String
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        updateSealInfoTask(
+            userModel,
+            orderId,
+            sealRange,
+            brokenSeals,
+            delivery
+        ).addOnCompleteListener(completion)
+
+        return completion
+    }
+
+
+    private fun updateSealInfoTask(
+        userModel: UserModel, orderId: String,
+        sealRange: String,
+        brokenSeals: String,
+        delivery: String
+    ): Task<Void> {
+        val orderRef = omc.document(userModel.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+            firebaseAuth.currentUser?.let {
+                val assocUser =
+                    AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
+
+                val sealsTemp = OrderSeals(
+                    ArrayList(sealRange.split("-")),
+                    ArrayList(brokenSeals.split("-")),
+                    assocUser
+                )
+
+                transaction.update(orderRef, "seals", sealsTemp)
+
+                /**
+                 * update delivery note number
+                 * */
+                val deliveryNote = DeliveryNote(delivery)
+
+                transaction.update(
+                    orderRef,
+                    "deliveryNote",
+                    deliveryNote
+                )
+            }
+
+            return@runTransaction null
+        }
     }
 }

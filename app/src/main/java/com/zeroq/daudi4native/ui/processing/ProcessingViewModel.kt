@@ -11,7 +11,6 @@ import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
 import com.zeroq.daudi4native.vo.Resource
 import javax.inject.Inject
-import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.data.repository.OmcRepository
 import com.zeroq.daudi4native.vo.CompletionLiveData
 
@@ -44,7 +43,7 @@ class ProcessingViewModel @Inject constructor(
     }
 
     fun updateExpire(user: UserModel, order: OrderModel, minutes: Long): CompletionLiveData {
-        return omcRepository.updateProcessingExpire(user, order, minutes)
+        return omcRepository.updateTruckExpiry(user, order, minutes, 1)
     }
 
 
@@ -55,6 +54,4 @@ class ProcessingViewModel @Inject constructor(
     ): CompletionLiveData {
         return omcRepository.moveToQueuing(user, orderId, minutes)
     }
-
-
 }

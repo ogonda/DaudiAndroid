@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class QueuedFragment : BaseFragment() {
@@ -122,7 +123,11 @@ class QueuedFragment : BaseFragment() {
         val expireClick =
             adapter.expireTvClick.observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    expireTimePicker(it.order)
+                    val now = Calendar.getInstance();
+
+                    if (it.order.truckStageData!!["2"]?.expiry!![0].expiry!!.before(now.time)) {
+                        expireTimePicker(it.order)
+                    }
                 }
 
 
