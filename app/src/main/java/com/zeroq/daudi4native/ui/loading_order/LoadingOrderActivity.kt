@@ -1,7 +1,11 @@
 package com.zeroq.daudi4native.ui.loading_order
 
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -48,6 +52,8 @@ class LoadingOrderActivity : BaseActivity() {
     lateinit var _user: UserModel
     lateinit var liveOrder: OrderModel
     private var depot: DepotModel? = null
+
+    private val REQUEST_CAPTURE_IMAGE: Int = 500
 
 
     companion object {
@@ -284,6 +290,27 @@ class LoadingOrderActivity : BaseActivity() {
                     toast("Sorry an error occurred")
                 }
             }
+    }
+
+
+    fun takePicture(view: View) {
+        val pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        if (pictureIntent.resolveActivity(packageManager) != null) {
+            startActivityForResult(pictureIntent, REQUEST_CAPTURE_IMAGE)
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.extras != null) {
+                val imageBitMap = data.extras?.get("data") as Bitmap;
+                iv_mk_logo.setImageBitmap(imageBitMap)
+            }
+        }
     }
 
 

@@ -272,8 +272,7 @@ class OmcRepository @Inject constructor(
                 transaction.update(orderRef, "printStatus.gatepass", p)
 
                 transaction.update(orderRef, "truck.stage", 4)
-
-
+                
                 val totalExpiredTimeTemp =
                     if (Calendar.getInstance().time.time > order!!.truckStageData!!["1"]?.expiry!![0].expiry!!.time) {
                         Calendar.getInstance().time.time - order.truckStageData!!["1"]?.expiry!![0].expiry!!.time
