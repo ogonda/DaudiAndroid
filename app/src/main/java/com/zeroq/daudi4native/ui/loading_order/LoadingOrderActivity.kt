@@ -13,6 +13,8 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import androidx.lifecycle.Observer
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.firebase.storage.FirebaseStorage
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -35,6 +37,8 @@ import kotlinx.android.synthetic.main.toolbar.*
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -309,8 +313,29 @@ class LoadingOrderActivity : BaseActivity() {
             if (data != null && data.extras != null) {
                 val imageBitMap = data.extras?.get("data") as Bitmap;
                 iv_mk_logo.setImageBitmap(imageBitMap)
+                uploadImage(imageBitMap);
             }
         }
+    }
+
+    private fun uploadImage(bitmap: Bitmap) {
+        // create storage reference
+        val storageRef = FirebaseStorage.getInstance().reference
+
+        // my 1st sample data
+        val mountainref = storageRef.child("images/mountain.jpeg")
+
+        Timber.e(mountainref.path);
+
+        val baos = ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+
+        // test upload
+        val uploadTask = mountainref.putBytes(data);
+        uploadTask.addOnFailureListener { p0 -> Timber.e(p0); }
+        uploadTask.addOnSuccessListener { Timber.e("all good") }
+
     }
 
 
