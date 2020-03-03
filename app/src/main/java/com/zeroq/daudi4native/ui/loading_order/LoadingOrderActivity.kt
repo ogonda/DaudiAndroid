@@ -1,7 +1,11 @@
 package com.zeroq.daudi4native.ui.loading_order
 
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -9,6 +13,8 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import androidx.lifecycle.Observer
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.firebase.storage.FirebaseStorage
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -31,6 +37,8 @@ import kotlinx.android.synthetic.main.toolbar.*
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -48,6 +56,8 @@ class LoadingOrderActivity : BaseActivity() {
     lateinit var _user: UserModel
     lateinit var liveOrder: OrderModel
     private var depot: DepotModel? = null
+
+    private val REQUEST_CAPTURE_IMAGE: Int = 500
 
 
     companion object {
@@ -284,6 +294,48 @@ class LoadingOrderActivity : BaseActivity() {
                     toast("Sorry an error occurred")
                 }
             }
+    }
+
+
+    fun takePicture(view: View) {
+        val pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        if (pictureIntent.resolveActivity(packageManager) != null) {
+            startActivityForResult(pictureIntent, REQUEST_CAPTURE_IMAGE)
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.extras != null) {
+                val imageBitMap = data.extras?.get("data") as Bitmap;
+                iv_mk_logo.setImageBitmap(imageBitMap)
+                uploadImage(imageBitMap);
+            }
+        }
+    }
+
+    private fun uploadImage(bitmap: Bitmap) {
+        // create storage reference
+        val storageRef = FirebaseStorage.getInstance().reference
+
+        // my 1st sample data
+        val mountainref = storageRef.child("images/mountain.jpeg")
+
+        Timber.e(mountainref.path);
+
+        val baos = ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+
+        // test upload
+        val uploadTask = mountainref.putBytes(data);
+        uploadTask.addOnFailureListener { p0 -> Timber.e(p0); }
+        uploadTask.addOnSuccessListener { Timber.e("all good") }
+
     }
 
 
