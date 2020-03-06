@@ -1,6 +1,9 @@
 package com.zeroq.daudi4native.utils
 
+import android.content.res.Resources
+import android.util.TypedValue
 import javax.inject.Inject
+
 
 class Utils @Inject constructor() {
 
@@ -16,5 +19,18 @@ class Utils @Inject constructor() {
         }
 
         return sb.toString().toInt()
+    }
+
+    /**
+     * Converting dp to pixel
+     */
+    fun dpToPx(dp: Int, r: Resources): Int {
+        return Math.round(
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp.toFloat(),
+                r.getDisplayMetrics()
+            )
+        )
     }
 }
