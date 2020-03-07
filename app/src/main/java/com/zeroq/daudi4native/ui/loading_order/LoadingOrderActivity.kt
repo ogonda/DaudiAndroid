@@ -37,6 +37,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_loading_order.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
@@ -369,22 +370,17 @@ class LoadingOrderActivity : BaseActivity() {
     }
 
     private fun uploadImage(bitmap: Bitmap) {
-        // create storage reference
-        val storageRef = FirebaseStorage.getInstance().reference
+        val upload = viewModel.uploadNote(bitmap, liveOrder)
 
-        // my 1st sample data
-        val mountainref = storageRef.child("images/mountain.jpeg")
+        upload.first.addOnSuccessListener {
+            upload.second.downloadUrl.addOnSuccessListener {
+                Timber.e("============================")
+                Timber.e(it.path)
+            }
 
-        Timber.e(mountainref.path);
-
-        val baos = ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-
-        // test upload
-        val uploadTask = mountainref.putBytes(data);
-        uploadTask.addOnFailureListener { p0 -> Timber.e(p0); }
-        uploadTask.addOnSuccessListener { Timber.e("all good") }
+        }.addOnFailureListener {
+            Timber.e(it)
+        }
 
     }
 
