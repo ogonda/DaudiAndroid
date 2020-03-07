@@ -25,9 +25,11 @@
     <string name="close">close</string>
     <string name="step_3">STEP 3 : Close Phone to Printer Connection</string>
     <string name="reprint">Reprint Your Receipt</string>
-    <string name="print">print</string>
     <string name="test_print">Test Print</string>
     <string name="pms_averange">PMS AVERAGE</string>
     <string name="ago_averange">AGO AVERAGE</string>
     <string name="ik_averange">IK AVERAGE</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="take_image">Take Image</string>
+    <string name="print">print</string>
 </resources>

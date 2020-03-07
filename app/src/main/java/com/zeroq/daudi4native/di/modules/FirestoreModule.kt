@@ -3,6 +3,8 @@ package com.zeroq.daudi4native.di.modules
 import com.google.firebase.firestore.CollectionReference
 import dagger.Module
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
@@ -17,6 +19,14 @@ class FirestoreModule {
     fun providesFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
     }
+
+    @Singleton
+    @Provides
+    fun providesFireStoreStorage(): FirebaseStorage {
+        return FirebaseStorage.getInstance()
+    }
+
+
 
     @Singleton
     @Provides

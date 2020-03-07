@@ -1,10 +1,13 @@
 package com.zeroq.daudi4native.ui.loading_order
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
@@ -12,6 +15,7 @@ import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.data.repository.AdminRepository
 import com.zeroq.daudi4native.data.repository.DepotRepository
 import com.zeroq.daudi4native.data.repository.OmcRepository
+import com.zeroq.daudi4native.data.repository.UploadRepository
 import com.zeroq.daudi4native.vo.CompletionLiveData
 import com.zeroq.daudi4native.vo.Resource
 import com.zeroq.daudi4native.vo.combineLatest
@@ -21,7 +25,8 @@ class LoadingOrderViewModel @Inject constructor(
     adminRepo: AdminRepository,
     var depotRepository: DepotRepository,
     var firebaseAuth: FirebaseAuth,
-    var omcRepository: OmcRepository
+    var omcRepository: OmcRepository,
+    var uploadRepository: UploadRepository
 ) : ViewModel() {
 
     private var _user: LiveData<Resource<UserModel>> = MutableLiveData()
@@ -83,6 +88,10 @@ class LoadingOrderViewModel @Inject constructor(
         return omcRepository.updateSealInfo(
             user, orderId, sealRange, brokenSeals, delivery
         )
+    }
+
+    fun uploadNote(bitmap: Bitmap, order: OrderModel): Pair<UploadTask, StorageReference> {
+        return uploadRepository.uploadNote(bitmap, order);
     }
 
 }

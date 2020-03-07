@@ -13,7 +13,8 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import androidx.lifecycle.Observer
-import com.google.android.gms.tasks.OnFailureListener
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.internal.ViewUtils.dpToPx
 import com.google.firebase.storage.FirebaseStorage
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -21,27 +22,31 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zeroq.daudi4native.R
+import com.zeroq.daudi4native.adapters.UploadNotesAdapter
 import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
-import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.data.models.UserModel
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
+import com.zeroq.daudi4native.utils.AdapterSpacer
 import com.zeroq.daudi4native.utils.ImageUtil
+import com.zeroq.daudi4native.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_loading_order.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class LoadingOrderActivity : BaseActivity() {
 
@@ -53,11 +58,18 @@ class LoadingOrderActivity : BaseActivity() {
     @Inject
     lateinit var activityUtil: ActivityUtil
 
+    @Inject
+    lateinit var utils: Utils
+
+
     lateinit var _user: UserModel
     lateinit var liveOrder: OrderModel
     private var depot: DepotModel? = null
 
+
     private val REQUEST_CAPTURE_IMAGE: Int = 500
+
+    val compositeDisposable = CompositeDisposable()
 
 
     companion object {
@@ -213,6 +225,45 @@ class LoadingOrderActivity : BaseActivity() {
                 requestPermissions()
             }
         }
+
+        /*
+        * add recycler adapter
+        * */
+        val adapter = UploadNotesAdapter()
+        notesRecycler.adapter = adapter;
+        notesRecycler!!.layoutManager = LinearLayoutManager(
+            applicationContext,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(2, resources), true))
+
+        /*
+        * test data
+        * */
+        val notes = ArrayList<Pair<Boolean, String>>()
+        notes.add(Pair(true, ""))
+
+        adapter.replaceDeliveryNotes(notes)
+
+        // consume events from adapter
+        val startCamSub = adapter.startCamera.subscribe {
+            takePicture()
+
+        }
+
+        val imageClicked = adapter.onClick.subscribe {
+
+        }
+
+        val imageLongClick = adapter.onLongPress.subscribe {
+
+        }
+
+        // add to a class of disponsing subscribers
+        compositeDisposable.add(compositeDisposable)
+        compositeDisposable.add(imageClicked)
+        compositeDisposable.add(imageLongClick)
     }
 
     private fun requestPermissions() {
@@ -297,7 +348,7 @@ class LoadingOrderActivity : BaseActivity() {
     }
 
 
-    fun takePicture(view: View) {
+    fun takePicture() {
         val pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         if (pictureIntent.resolveActivity(packageManager) != null) {
@@ -319,22 +370,17 @@ class LoadingOrderActivity : BaseActivity() {
     }
 
     private fun uploadImage(bitmap: Bitmap) {
-        // create storage reference
-        val storageRef = FirebaseStorage.getInstance().reference
+        val upload = viewModel.uploadNote(bitmap, liveOrder)
 
-        // my 1st sample data
-        val mountainref = storageRef.child("images/mountain.jpeg")
+        upload.first.addOnSuccessListener {
+            upload.second.downloadUrl.addOnSuccessListener {
+                Timber.e("============================")
+                Timber.e(it.path)
+            }
 
-        Timber.e(mountainref.path);
-
-        val baos = ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-
-        // test upload
-        val uploadTask = mountainref.putBytes(data);
-        uploadTask.addOnFailureListener { p0 -> Timber.e(p0); }
-        uploadTask.addOnSuccessListener { Timber.e("all good") }
+        }.addOnFailureListener {
+            Timber.e(it)
+        }
 
     }
 
@@ -345,5 +391,10 @@ class LoadingOrderActivity : BaseActivity() {
         } else {
             btnPrint.visibility = View.VISIBLE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 }
