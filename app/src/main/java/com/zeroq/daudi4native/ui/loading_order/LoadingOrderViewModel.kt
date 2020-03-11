@@ -94,4 +94,20 @@ class LoadingOrderViewModel @Inject constructor(
         return uploadRepository.uploadNote(bitmap, order);
     }
 
+    fun addDeliveryNotePath(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): CompletionLiveData {
+        return omcRepository.addDeliveryNotePath(userModel, orderId, path)
+    }
+
+    fun removeDeliveryNotePath(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): CompletionLiveData {
+        return omcRepository.removeDeliveryNotePath(userModel, orderId, path)
+    }
+
 }

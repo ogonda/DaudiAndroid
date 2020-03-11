@@ -71,6 +71,10 @@ class LoadingOrderActivity : BaseActivity() {
 
     val compositeDisposable = CompositeDisposable()
 
+    /**
+     * global adapter
+     * */
+    lateinit var adapter: UploadNotesAdapter
 
     companion object {
         const val ID_ORDER_EXTRA = "ORDERID"
@@ -96,6 +100,48 @@ class LoadingOrderActivity : BaseActivity() {
 
         logic()
         createProgress()
+        setupAdapter()
+
+    }
+
+    private fun setupAdapter() {
+        /*
+               * add recycler adapter
+               * */
+        adapter = UploadNotesAdapter()
+        notesRecycler.adapter = adapter
+        notesRecycler!!.layoutManager = LinearLayoutManager(
+            applicationContext,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(5, resources), true))
+
+        /*
+        * test data
+        * */
+        val notes = ArrayList<Pair<Boolean, String>>()
+        notes.add(Pair(true, ""))
+
+        adapter.replaceDeliveryNotes(notes)
+
+        // consume events from adapter
+        val startCamSub = adapter.startCamera.subscribe {
+            takePicture()
+        }
+
+        val imageClicked = adapter.onClick.subscribe {
+
+        }
+
+        val imageLongClick = adapter.onLongPress.subscribe {
+            removeImage(it.second)
+        }
+
+        // add to a class of disponsing subscribers
+        compositeDisposable.add(startCamSub)
+        compositeDisposable.add(imageClicked)
+        compositeDisposable.add(imageLongClick)
     }
 
     lateinit var progressDialog: Dialog
@@ -167,6 +213,18 @@ class LoadingOrderActivity : BaseActivity() {
                 liveOrder = it.data()!!
                 initialOrderValues(it.data()!!)
 
+                /**
+                 * set adapters data
+                 * */
+                val pathTemp = ArrayList<Pair<Boolean, String>>()
+                it.data()?.deliveryNote?.photos?.let { paths ->
+                    if (paths.size < 5) pathTemp.add(Pair(true, ""))
+                    paths.forEach { v -> pathTemp.add(Pair(false, v)) }
+                }
+
+                adapter.replaceDeliveryNotes(pathTemp)
+
+
             } else {
                 Timber.e(it.error())
             }
@@ -202,11 +260,9 @@ class LoadingOrderActivity : BaseActivity() {
         tv_ago_value.text = orderModel.fuel?.ago?.qty.toString()
         tv_ik_value.text = orderModel.fuel?.ik?.qty.toString()
 
-        // qr
-        val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${orderModel.QbConfig?.InvoiceId}"
+        val depotUrl = "https://daudi.africa/orders/${orderModel.Id}"
 
-        val dimensions = imageUtil.dpToPx(this, 150)
+        val dimensions = imageUtil.dpToPx(this, 170)
 
         val thread = Thread(Runnable {
             val myBitmap = QRCode.from(depotUrl)
@@ -225,45 +281,6 @@ class LoadingOrderActivity : BaseActivity() {
                 requestPermissions()
             }
         }
-
-        /*
-        * add recycler adapter
-        * */
-        val adapter = UploadNotesAdapter()
-        notesRecycler.adapter = adapter;
-        notesRecycler!!.layoutManager = LinearLayoutManager(
-            applicationContext,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(2, resources), true))
-
-        /*
-        * test data
-        * */
-        val notes = ArrayList<Pair<Boolean, String>>()
-        notes.add(Pair(true, ""))
-
-        adapter.replaceDeliveryNotes(notes)
-
-        // consume events from adapter
-        val startCamSub = adapter.startCamera.subscribe {
-            takePicture()
-
-        }
-
-        val imageClicked = adapter.onClick.subscribe {
-
-        }
-
-        val imageLongClick = adapter.onLongPress.subscribe {
-
-        }
-
-        // add to a class of disponsing subscribers
-        compositeDisposable.add(compositeDisposable)
-        compositeDisposable.add(imageClicked)
-        compositeDisposable.add(imageLongClick)
     }
 
     private fun requestPermissions() {
@@ -364,21 +381,37 @@ class LoadingOrderActivity : BaseActivity() {
             if (data != null && data.extras != null) {
                 val imageBitMap = data.extras?.get("data") as Bitmap;
                 iv_mk_logo.setImageBitmap(imageBitMap)
-                uploadImage(imageBitMap);
+                uploadImage(imageBitMap)
             }
         }
+    }
+
+    private fun removeImage(path: String) {
+        viewModel.removeDeliveryNotePath(_user, liveOrder.Id!!, path)
+            .observe(this, Observer {
+                if (it.isSuccessful) {
+                    toast("photo removed")
+                } else {
+                    toast("Photo was not removed because of an error")
+                }
+            })
     }
 
     private fun uploadImage(bitmap: Bitmap) {
         val upload = viewModel.uploadNote(bitmap, liveOrder)
 
         upload.first.addOnSuccessListener {
-            upload.second.downloadUrl.addOnSuccessListener {
-                Timber.e("============================")
-                Timber.e(it.path)
-            }
+            viewModel.addDeliveryNotePath(_user, liveOrder.Id!!, upload.second.path)
+                .observe(this, Observer {
+                    if (it.isSuccessful) {
+                        toast("photo added")
+                    } else {
+                        toast("Error:: uploading photo")
+                    }
+                })
 
         }.addOnFailureListener {
+            toast("A n error occurred nothing was uploaded")
             Timber.e(it)
         }
 
