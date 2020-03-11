@@ -209,8 +209,7 @@ class TruckDetailActivity : BaseActivity() {
          * */
 
 
-        val depotUrl =
-            "https://us-central1-emkaybeta.cloudfunctions.net/truckDetail?D=${_user.config?.app?.depotid}&T=${order.QbConfig?.InvoiceId}"
+        val depotUrl = "https://daudi.africa/orders/${depotOrder?.Id}"
 
         val dimensions = imageUtil.dpToPx(this, 150)
 

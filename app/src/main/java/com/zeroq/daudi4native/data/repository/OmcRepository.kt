@@ -272,7 +272,7 @@ class OmcRepository @Inject constructor(
                 transaction.update(orderRef, "printStatus.gatepass", p)
 
                 transaction.update(orderRef, "truck.stage", 4)
-                
+
                 val totalExpiredTimeTemp =
                     if (Calendar.getInstance().time.time > order!!.truckStageData!!["1"]?.expiry!![0].expiry!!.time) {
                         Calendar.getInstance().time.time - order.truckStageData!!["1"]?.expiry!![0].expiry!!.time
@@ -526,12 +526,10 @@ class OmcRepository @Inject constructor(
                 /**
                  * update delivery note number
                  * */
-                val deliveryNote = DeliveryNote(loadingEvent.DeliveryNumber)
-
                 transaction.update(
                     orderRef,
-                    "deliveryNote",
-                    deliveryNote
+                    "deliveryNote.value",
+                    loadingEvent.DeliveryNumber
                 )
             }
 
@@ -595,16 +593,49 @@ class OmcRepository @Inject constructor(
                 /**
                  * update delivery note number
                  * */
-                val deliveryNote = DeliveryNote(delivery)
-
                 transaction.update(
                     orderRef,
-                    "deliveryNote",
-                    deliveryNote
+                    "deliveryNote.value",
+                    delivery
                 )
             }
 
             return@runTransaction null
         }
     }
+
+    /**
+     * add a single delivery note image
+     * */
+    fun addDeliveryNotePath(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        addDeliveryNotePathTask(userModel, orderId, path).addOnCompleteListener(completion);
+
+        return completion;
+    }
+
+
+    private fun addDeliveryNotePathTask(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): Task<Void> {
+        val orderRef = omc.document(userModel.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
+            val photos = order?.deliveryNote?.photos
+            photos?.add(path);
+            transaction.update(orderRef, "deliveryNote.photos", photos)
+            return@runTransaction null
+        }
+    }
+
+
 }
