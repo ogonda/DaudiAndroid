@@ -115,7 +115,7 @@ class LoadingOrderActivity : BaseActivity() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(3, resources), true))
+        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(5, resources), true))
 
         /*
         * test data
@@ -135,7 +135,7 @@ class LoadingOrderActivity : BaseActivity() {
         }
 
         val imageLongClick = adapter.onLongPress.subscribe {
-
+            removeImage(it.second)
         }
 
         // add to a class of disponsing subscribers
@@ -260,9 +260,9 @@ class LoadingOrderActivity : BaseActivity() {
         tv_ago_value.text = orderModel.fuel?.ago?.qty.toString()
         tv_ik_value.text = orderModel.fuel?.ik?.qty.toString()
 
-        val depotUrl = "https://daudi.africa/orders/${orderModel?.Id}"
+        val depotUrl = "https://daudi.africa/orders/${orderModel.Id}"
 
-        val dimensions = imageUtil.dpToPx(this, 150)
+        val dimensions = imageUtil.dpToPx(this, 170)
 
         val thread = Thread(Runnable {
             val myBitmap = QRCode.from(depotUrl)
@@ -381,9 +381,20 @@ class LoadingOrderActivity : BaseActivity() {
             if (data != null && data.extras != null) {
                 val imageBitMap = data.extras?.get("data") as Bitmap;
                 iv_mk_logo.setImageBitmap(imageBitMap)
-                uploadImage(imageBitMap);
+                uploadImage(imageBitMap)
             }
         }
+    }
+
+    private fun removeImage(path: String) {
+        viewModel.removeDeliveryNotePath(_user, liveOrder.Id!!, path)
+            .observe(this, Observer {
+                if (it.isSuccessful) {
+                    toast("photo removed")
+                } else {
+                    toast("Photo was not removed because of an error")
+                }
+            })
     }
 
     private fun uploadImage(bitmap: Bitmap) {
@@ -400,6 +411,7 @@ class LoadingOrderActivity : BaseActivity() {
                 })
 
         }.addOnFailureListener {
+            toast("A n error occurred nothing was uploaded")
             Timber.e(it)
         }
 

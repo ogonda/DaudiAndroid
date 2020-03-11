@@ -638,4 +638,36 @@ class OmcRepository @Inject constructor(
     }
 
 
+    /**
+     * add a single delivery note image
+     * */
+    fun removeDeliveryNotePath(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): CompletionLiveData {
+        val completion = CompletionLiveData()
+        removeDeliveryNotePathTask(userModel, orderId, path).addOnCompleteListener(completion);
+
+        return completion
+    }
+
+
+    private fun removeDeliveryNotePathTask(
+        userModel: UserModel,
+        orderId: String,
+        path: String
+    ): Task<Void> {
+        val orderRef = omc.document(userModel.config?.omcId!!)
+            .collection("orders")
+            .document(orderId)
+
+        return firestore.runTransaction { transaction ->
+            val order: OrderModel? = transaction.get(orderRef).toObject(OrderModel::class.java)
+            val photos = order?.deliveryNote?.photos?.filter { p -> p != path } as ArrayList<String>
+            transaction.update(orderRef, "deliveryNote.photos", photos)
+            return@runTransaction null
+        }
+    }
+
 }
