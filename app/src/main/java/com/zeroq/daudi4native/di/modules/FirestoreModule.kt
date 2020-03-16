@@ -26,6 +26,10 @@ class FirestoreModule {
         return FirebaseStorage.getInstance()
     }
 
+    @Provides
+    fun providesStorageReference(storage: FirebaseStorage): StorageReference {
+        return storage.reference
+    }
 
 
     @Singleton
