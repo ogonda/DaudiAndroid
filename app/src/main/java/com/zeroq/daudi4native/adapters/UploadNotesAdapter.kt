@@ -1,16 +1,19 @@
 package com.zeroq.daudi4native.adapters
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.storage.StorageReference
 import com.zeroq.daudi4native.R
 import io.reactivex.subjects.PublishSubject
 
-class UploadNotesAdapter : RecyclerView.Adapter<UploadNotesAdapter.ViewHolder>() {
+class UploadNotesAdapter(var storageReference: StorageReference) :
+    RecyclerView.Adapter<UploadNotesAdapter.ViewHolder>() {
 
     private val paths = ArrayList<Pair<Boolean, String>>()
     private var context: Context? = null;
@@ -48,7 +51,7 @@ class UploadNotesAdapter : RecyclerView.Adapter<UploadNotesAdapter.ViewHolder>()
         val note = paths[position]
 
         context?.let {
-            holder.bindDeliveryNote(it, note)
+            holder.bindDeliveryNote(it, note, storageReference)
         }
 
         /*
@@ -79,10 +82,21 @@ class UploadNotesAdapter : RecyclerView.Adapter<UploadNotesAdapter.ViewHolder>()
             noteImageView = view.findViewById(R.id.postImageView)
         }
 
-        fun bindDeliveryNote(context: Context, note: Pair<Boolean, String>) {
+        fun bindDeliveryNote(
+            context: Context,
+            note: Pair<Boolean, String>,
+            storageReference: StorageReference
+        ) {
+            val ONE_MEGABYTE = 1024 * 1024
+
             if (!note.first) {
-                noteImageView?.let {
-                    Glide.with(context).load(note.second).centerCrop().into(it)
+                note.second.let {
+                    val pathReference = storageReference.child(it)
+
+                    pathReference.getBytes(ONE_MEGABYTE.toLong()).addOnSuccessListener { data ->
+                        val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                        noteImageView?.setImageBitmap(bitmap)
+                    }
                 }
             } else {
                 noteImageView?.let {

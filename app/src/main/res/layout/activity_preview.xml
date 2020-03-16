@@ -4,7 +4,8 @@
         android:id="@+id/imagePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#000000">
 
 
     <com.jsibbold.zoomage.ZoomageView

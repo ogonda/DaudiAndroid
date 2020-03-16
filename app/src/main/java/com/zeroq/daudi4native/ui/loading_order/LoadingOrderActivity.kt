@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.dpToPx
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -27,6 +28,7 @@ import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.ui.preview.PreviewActivity
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
 import com.zeroq.daudi4native.utils.AdapterSpacer
@@ -60,6 +62,9 @@ class LoadingOrderActivity : BaseActivity() {
 
     @Inject
     lateinit var utils: Utils
+
+    @Inject
+    lateinit var storageReference: StorageReference
 
 
     lateinit var _user: UserModel
@@ -108,7 +113,7 @@ class LoadingOrderActivity : BaseActivity() {
         /*
                * add recycler adapter
                * */
-        adapter = UploadNotesAdapter()
+        adapter = UploadNotesAdapter(storageReference)
         notesRecycler.adapter = adapter
         notesRecycler!!.layoutManager = LinearLayoutManager(
             applicationContext,
@@ -131,7 +136,7 @@ class LoadingOrderActivity : BaseActivity() {
         }
 
         val imageClicked = adapter.onClick.subscribe {
-
+            PreviewActivity.startPreviewActivity(this, it.second)
         }
 
         val imageLongClick = adapter.onLongPress.subscribe {
@@ -421,8 +426,10 @@ class LoadingOrderActivity : BaseActivity() {
     private fun hideButton(hide: Boolean) {
         if (hide) {
             btnPrint.visibility = View.GONE
+            notesRecycler.visibility = View.GONE
         } else {
             btnPrint.visibility = View.VISIBLE
+            notesRecycler.visibility = View.VISIBLE
         }
     }
 

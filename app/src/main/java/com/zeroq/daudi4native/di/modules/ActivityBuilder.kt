@@ -7,6 +7,7 @@ import com.zeroq.daudi4native.ui.average_prices.AveragePriceActivity
 import com.zeroq.daudi4native.ui.device_list.DeviceListActivity
 import com.zeroq.daudi4native.ui.loading_order.LoadingOrderActivity
 import com.zeroq.daudi4native.ui.login.LoginActivity
+import com.zeroq.daudi4native.ui.preview.PreviewActivity
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.ui.splash.SplashActivity
 import com.zeroq.daudi4native.ui.truck_detail.TruckDetailActivity
@@ -46,4 +47,7 @@ abstract class ActivityBuilder {
 
     @ContributesAndroidInjector
     internal abstract fun bindDeviceListActivity(): DeviceListActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindPreviewActivity(): PreviewActivity
 }
