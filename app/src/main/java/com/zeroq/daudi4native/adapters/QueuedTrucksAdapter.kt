@@ -261,7 +261,8 @@ class QueuedTrucksAdapter(var activityUtil: ActivityUtil) :
         }
 
         fun bindPhoto(order: OrderModel, context: Context) {
-            _orderNumber?.text = order.QbConfig?.InvoiceId
+            _orderNumber?.text = order.QbConfig?.InvoiceNumber
+
             numberPlate?.text = order.truck?.truckdetail?.numberplate
             _companyName?.text = order.customer?.name
             _driverName?.text = order.truck?.driverdetail?.name

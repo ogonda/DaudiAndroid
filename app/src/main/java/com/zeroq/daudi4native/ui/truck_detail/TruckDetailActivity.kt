@@ -158,7 +158,8 @@ class TruckDetailActivity : BaseActivity() {
         if (order.fuel?.ago?.qty != 0) _fuelTypeList.add("AGO")
         if (order.fuel?.ik?.qty != 0) _fuelTypeList.add("IK")
 
-        tv_truck_id.text = order.QbConfig?.InvoiceId
+        tv_truck_id.text = order.QbConfig?.InvoiceNumber
+        
         tv_customer_value.text = order.customer?.name
         et_driver_name.setText(order.truck?.driverdetail?.name)
         et_driver_id.setText(order.truck?.driverdetail?.id)
