@@ -243,7 +243,7 @@ class LoadingOrderActivity : BaseActivity() {
         tv_today_date.text = sdf.format(Date()).toUpperCase()
 
 
-        tv_truck_id.text = orderModel.QbConfig?.InvoiceId
+        tv_truck_id.text = orderModel.QbConfig?.InvoiceNumber
 
         // driver data
         tv_driver_value.text = orderModel.truck?.driverdetail?.name

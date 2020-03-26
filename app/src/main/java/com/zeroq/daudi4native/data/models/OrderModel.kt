@@ -26,8 +26,8 @@ data class DeliveryNote(var value: String?, var photos: ArrayList<String>?) {
     constructor() : this(null, ArrayList())
 }
 
-data class QbConfig(var InvoiceId: String?) {
-    constructor() : this(null)
+data class QbConfig(var InvoiceId: String?, var InvoiceNumber: String?) {
+    constructor() : this(null, null)
 }
 
 

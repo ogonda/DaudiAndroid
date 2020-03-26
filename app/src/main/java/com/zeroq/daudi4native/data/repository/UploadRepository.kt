@@ -24,7 +24,7 @@ class UploadRepository @Inject constructor(
 
 
         val baos = ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val data = baos.toByteArray()
 
 
