@@ -43,7 +43,9 @@ class NoDepot : BaseActivity() {
 
     companion object {
         fun startActivity(context: Context) {
-            context.startActivity(Intent(context, NoDepot::class.java))
+            val intent = Intent(context, NoDepot::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            context.startActivity(intent)
         }
     }
 }

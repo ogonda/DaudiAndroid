@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_printing.*
 import kotlinx.android.synthetic.main.activity_truck_detail.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import java.lang.Exception
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -147,8 +148,8 @@ class PrintingActivity : BaseActivity() {
                 BluetoothService.MESSAGE_STATE_CHANGE -> when (msg.arg1) {
                     BluetoothService.STATE_CONNECTED -> {
                         toast("Connect successful")
-                        btnClose!!.isEnabled = true
-                        btn_print!!.isEnabled = true
+                        btnClose?.isEnabled = true
+                        btn_print?.isEnabled = true
                     }
                     BluetoothService.STATE_CONNECTING -> {
                         Timber.d("Connecting")
@@ -197,11 +198,14 @@ class PrintingActivity : BaseActivity() {
                 }
 
                 btn_print -> {
-                    databasePrintTransactions()
-
-                    Thread {
+//                    Thread { }.start()
+                    try {
                         startPrintingProcess()
-                    }.start()
+                    } catch (e: Exception) {
+                        toast("An error occured try again")
+                    } finally {
+                        databasePrintTransactions()
+                    }
                 }
 
                 btnSandbox -> {
@@ -302,7 +306,7 @@ class PrintingActivity : BaseActivity() {
                     if (!it.isSuccessful) {
                         Timber.e(it.error())
                     } else {
-                        toast("written to database, wait for receipt")
+                        toast("Printing successful")
                     }
                 })
         }
@@ -314,7 +318,7 @@ class PrintingActivity : BaseActivity() {
                     if (!it.isSuccessful) {
                         Timber.e(it.error())
                     } else {
-                        toast("written to database, wait for receipt")
+                        toast("Printing successful")
                     }
                 })
         }

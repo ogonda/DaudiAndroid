@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+
 import timber.log.Timber;
 
 public class BluetoothService {
@@ -231,8 +232,8 @@ public class BluetoothService {
 
             try {
                 tmp = BluetoothService.this.mAdapter.listenUsingRfcommWithServiceRecord("BTPrinter", BluetoothService.MY_UUID);
-            } catch (IOException var4) {
-                Log.e("BluetoothService", "listen() failed", var4);
+            } catch (Exception var4) {
+                Timber.e(var4, "listen() failed");
             }
 
             this.mmServerSocket = tmp;
@@ -248,7 +249,7 @@ public class BluetoothService {
 
                 try {
                     socket = this.mmServerSocket.accept();
-                } catch (IOException var6) {
+                } catch (Exception var6) {
                     Timber.e(var6, "accept() failed");
                     break;
                 }
