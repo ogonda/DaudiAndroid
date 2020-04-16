@@ -27,6 +27,7 @@
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
 
+        <activity android:name=".ui.no_depot.NoDepot" />
         <activity android:name=".ui.preview.PreviewActivity" />
         <activity android:name=".ui.average_prices.AveragePriceActivity" />
         <activity android:name=".ui.loading_order.LoadingOrderActivity" />

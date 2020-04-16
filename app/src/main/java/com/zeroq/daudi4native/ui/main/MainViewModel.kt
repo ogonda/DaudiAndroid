@@ -24,6 +24,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var _user: LiveData<Resource<UserModel>> = MutableLiveData()
+
     /*
     * orders that are in the required stage
     * */
