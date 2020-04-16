@@ -8,6 +8,7 @@ import com.zeroq.daudi4native.ui.loading.LoadingViewModel
 import com.zeroq.daudi4native.ui.loading_order.LoadingOrderViewModel
 import com.zeroq.daudi4native.ui.login.LoginViewModel
 import com.zeroq.daudi4native.ui.main.MainViewModel
+import com.zeroq.daudi4native.ui.no_depot.NoDepotViewModel
 import com.zeroq.daudi4native.ui.printing.PrintingViewModel
 import com.zeroq.daudi4native.ui.processing.ProcessingViewModel
 import com.zeroq.daudi4native.ui.queued.QueuedViewModel
@@ -77,7 +78,12 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(AverageViewModel::class)
-    abstract fun bind(averageViewModel: AverageViewModel): ViewModel
+    abstract fun bindAverageViewModel(averageViewModel: AverageViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NoDepotViewModel::class)
+    abstract fun bindNoDepotViewModel(noDepotViewModel: NoDepotViewModel): ViewModel
 
 
     @Binds

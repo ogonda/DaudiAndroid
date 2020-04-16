@@ -39,6 +39,7 @@ import com.zeroq.daudi4native.events.QueueingEvent
 import com.zeroq.daudi4native.ui.average_prices.AveragePriceActivity
 import com.zeroq.daudi4native.ui.dialogs.ProfileDialogFragment
 import com.zeroq.daudi4native.ui.main.MainViewModel
+import com.zeroq.daudi4native.ui.no_depot.NoDepot
 import com.zeroq.daudi4native.utils.ImageUtil
 import com.zeroq.daudi4native.utils.TruckNotification
 import com.zeroq.daudi4native.utils.Utils
@@ -53,6 +54,8 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import androidx.lifecycle.distinctUntilChanged
+import com.zeroq.daudi4native.data.models.UserModel
 
 
 class MainActivity : BaseActivity() {
@@ -87,7 +90,9 @@ class MainActivity : BaseActivity() {
 
     companion object {
         fun startActivity(context: Context) {
-            context.startActivity(Intent(context, MainActivity::class.java))
+            val intent = Intent(context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            context.startActivity(intent)
         }
     }
 
@@ -196,11 +201,18 @@ class MainActivity : BaseActivity() {
     }
 
     private fun operations() {
+        mainViewModel.getUser().distinctUntilChanged().observe(this, Observer {
 
-        mainViewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {
-                it.data()?.let { u ->
-                    mainViewModel.setSwitchUser(u)
+                it.data()?.config?.app?.depotid?.let { depotId ->
+                    if (depotId.isNotEmpty()) {
+                        mainViewModel.setSwitchUser(it.data()!!)
+                    } else NoDepot.startActivity(
+                        this
+                    )
+                } ?: run {
+                    NoDepot.startActivity(this)
+                    finish()
                 }
 
             } else {

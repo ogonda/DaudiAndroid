@@ -32,4 +32,6 @@
     <string name="take_picture">Take Picture</string>
     <string name="take_image">Take Image</string>
     <string name="print">print</string>
+    <string name="add_depot_request">Please ask the management to assign you to a particular Depot</string>
+    <string name="logout">Logout</string>
 </resources>
