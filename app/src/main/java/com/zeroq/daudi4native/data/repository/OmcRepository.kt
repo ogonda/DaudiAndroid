@@ -516,8 +516,8 @@ class OmcRepository @Inject constructor(
                     AssociatedUser(it.displayName, it.uid, Calendar.getInstance().time)
 
                 val sealsTemp = OrderSeals(
-                    ArrayList(loadingEvent.sealRange?.split("-")!!),
                     ArrayList(loadingEvent.brokenSeal?.split("-")!!),
+                    ArrayList(loadingEvent.sealRange?.split("-")!!),
                     assocUser
                 )
 
