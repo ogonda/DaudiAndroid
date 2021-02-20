@@ -8,6 +8,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
+    buildTypes{
+        customDebugType {
+            debuggable true
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.zeroq.daudi4native"
