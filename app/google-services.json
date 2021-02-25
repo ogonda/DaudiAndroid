@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:386506684627:android:3e3c4e18ecf32fe4503c26",
+        "mobilesdk_app_id": "1:386506684627:android:db28cf444b77a09f503c26",
         "android_client_info": {
           "package_name": "com.zeroq.daudi4native"
         }
       },
       "oauth_client": [
         {
-          "client_id": "386506684627-v7ehpgu20bgu3map9ub7h4e6l5to77km.apps.googleusercontent.com",
+          "client_id": "386506684627-dq8aqgs0h6l7ihgch9rvv8qadmg1ndu6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.zeroq.daudi4native",
-            "certificate_hash": "a8722a82ef63b9b5d2d99abd12fbfb4f5b1c67bf"
+            "certificate_hash": "9c7b48384b8fc7a7a38331a8ff843a618f042b16"
           }
         },
         {
