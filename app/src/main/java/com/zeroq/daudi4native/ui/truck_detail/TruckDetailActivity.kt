@@ -26,22 +26,13 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.*
+import com.zeroq.daudi4native.databinding.ActivityTruckDetailBinding
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
 import com.zeroq.daudi4native.utils.ImageUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_truck_detail.*
-import kotlinx.android.synthetic.main.activity_truck_detail.btnPrint
-import kotlinx.android.synthetic.main.activity_truck_detail.content_scroll
-import kotlinx.android.synthetic.main.activity_truck_detail.layout_constraint
-import kotlinx.android.synthetic.main.activity_truck_detail.tv_ago
-import kotlinx.android.synthetic.main.activity_truck_detail.tv_ik
-import kotlinx.android.synthetic.main.activity_truck_detail.tv_pms
-import kotlinx.android.synthetic.main.activity_truck_detail.tv_today_date
-import kotlinx.android.synthetic.main.activity_truck_detail.tv_truck_id
-import kotlinx.android.synthetic.main.toolbar.toolbar
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -61,6 +52,7 @@ class TruckDetailActivity : BaseActivity() {
     @Inject
     lateinit var activityUtil: ActivityUtil
 
+    lateinit var binding: ActivityTruckDetailBinding
 
     lateinit var truckDetailViewModel: TruckDetailViewModel
 
@@ -79,7 +71,9 @@ class TruckDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_truck_detail)
+        binding = ActivityTruckDetailBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
 
         /**
@@ -88,16 +82,16 @@ class TruckDetailActivity : BaseActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
         viewComp = listOf(
-            et_c1_qty, et_c2_qty,
-            et_c3_qty, et_c4_qty, et_c5_qty, et_c6_qty, et_c7_qty
+            binding.etC1Qty, binding.etC2Qty,
+            binding.etC3Qty, binding.etC4Qty, binding.etC5Qty, binding.etC6Qty, binding.etC7Qty
         )
 
         btnComp = listOf(
-            et_c1_type, et_c2_type,
-            et_c3_type, et_c4_type, et_c5_type, et_c6_type, et_c7_type
+            binding.etC1Type, binding.etC2Type,
+            binding.etC3Type, binding.etC4Type, binding.etC5Type, binding.etC6Type, binding.etC7Type
         )
 
-        _topInputs = listOf(et_driver_name, et_driver_id, et_driver_plate)
+        _topInputs = listOf(binding.etDriverName, binding.etDriverId, binding.etDriverPlate)
 
         /*
         * set  the viewModel
@@ -122,7 +116,7 @@ class TruckDetailActivity : BaseActivity() {
             if (it.isSuccessful) {
 
                 it.data()?.let { depo ->
-                    tv_depot_name_d.text = "[ ${depo.Name} ]"
+                    binding.tvDepotNameD.text = "[ ${depo.Name} ]"
                 }
             } else {
                 Timber.e(it.error())
@@ -158,25 +152,25 @@ class TruckDetailActivity : BaseActivity() {
         if (order.fuel?.ago?.qty != 0) _fuelTypeList.add("AGO")
         if (order.fuel?.ik?.qty != 0) _fuelTypeList.add("IK")
 
-        tv_truck_id.text = order.QbConfig?.InvoiceNumber
+        binding.tvTruckId.text = order.QbConfig?.InvoiceNumber
         
-        tv_customer_value.text = order.customer?.name
-        et_driver_name.setText(order.truck?.driverdetail?.name)
-        et_driver_id.setText(order.truck?.driverdetail?.id)
-        et_driver_plate.setText(order.truck?.truckdetail?.numberplate)
+        binding.tvCustomerValue.text = order.customer?.name
+        binding.etDriverName.setText(order.truck?.driverdetail?.name)
+        binding.etDriverId.setText(order.truck?.driverdetail?.id)
+        binding.etDriverPlate.setText(order.truck?.truckdetail?.numberplate)
 
         // fuel
-        tv_pms.text = "PMS [ " + order.fuel?.pms?.qty + " ]"
-        tv_ago.text = "AGO [ " + order.fuel?.ago?.qty + " ]"
-        tv_ik.text = "IK      [ " + order.fuel?.ik?.qty + " ]"
+        binding.tvPms.text = "PMS [ " + order.fuel?.pms?.qty + " ]"
+        binding.tvAgo.text = "AGO [ " + order.fuel?.ago?.qty + " ]"
+        binding.tvIk.text = "IK      [ " + order.fuel?.ik?.qty + " ]"
 
 
         // fuel entries
 
 
-        tv_pms_entry.text = getBatchName(order.fuel?.pms!!)
-        tv_ago_entry.text = getBatchName(order.fuel?.ago!!)
-        tv_ik_entry.text = getBatchName(order.fuel?.ik!!)
+        binding.tvPmsEntry.text = getBatchName(order.fuel?.pms!!)
+        binding.tvAgoEntry.text = getBatchName(order.fuel?.ago!!)
+        binding.tvIkEntry.text = getBatchName(order.fuel?.ik!!)
 
 
 
@@ -193,17 +187,17 @@ class TruckDetailActivity : BaseActivity() {
             }
         }
 
-        tv_auth_by_value.text = order.truckStageData!!["1"]?.user?.name
+        binding.tvAuthByValue.text = order.truckStageData!!["1"]?.user?.name
 
         // display name
-        tv_confirmed_by_value.text = firebaseAuth.currentUser?.displayName
+        binding.tvConfirmedByValue.text = firebaseAuth.currentUser?.displayName
 
 
         /**
          * current data, will change it later to be regenerated before printing
          * */
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm aaa")
-        tv_today_date.text = sdf.format(Date()).toUpperCase()
+        binding.tvTodayDate.text = sdf.format(Date()).toUpperCase()
 
         /**
          * create qr
@@ -220,13 +214,13 @@ class TruckDetailActivity : BaseActivity() {
                 .bitmap()
 
             runOnUiThread {
-                qr.setImageBitmap(myBitmap)
+                binding.qr.setImageBitmap(myBitmap)
             }
         })
 
         thread.start()
 
-        btnPrint.setOnClickListener {
+        binding.btnPrint.setOnClickListener {
             progressDialog.show()
             requestPermissions()
         }
@@ -237,14 +231,14 @@ class TruckDetailActivity : BaseActivity() {
         if (order.printStatus?.LoadingOrder?.status != null
             && order.printStatus?.LoadingOrder?.status!!
         ) {
-            activityUtil.disableViews(layout_constraint)
-            btnPrint.isEnabled = true
+            activityUtil.disableViews(binding.layoutConstraint)
+            binding.btnPrint.isEnabled = true
         }
 
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar.toolbar)
     }
 
     private lateinit var progressDialog: Dialog
@@ -497,9 +491,9 @@ class TruckDetailActivity : BaseActivity() {
             }
         }
 
-        val driverName = et_driver_name.text.toString().toUpperCase()
-        val driverId = et_driver_id.text.toString().toUpperCase()
-        val numberPlate = et_driver_plate.text.toString().toUpperCase()
+        val driverName = binding.etDriverName.text.toString().toUpperCase()
+        val driverId = binding.etDriverId.text.toString().toUpperCase()
+        val numberPlate = binding.etDriverPlate.text.toString().toUpperCase()
 
         truckDetailViewModel.updateCompartmentAndDriver(
             _user,
@@ -515,7 +509,7 @@ class TruckDetailActivity : BaseActivity() {
                 cleanPageForPrinting()
             } else {
                 progressDialog.dismiss()
-                Snackbar.make(layout_constraint, "An error occurred", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.layoutConstraint, "An error occurred", Snackbar.LENGTH_SHORT).show()
                 Timber.e(it.error()!!)
 
             }
@@ -531,7 +525,7 @@ class TruckDetailActivity : BaseActivity() {
     var saveImageSub: Disposable? = null
     private fun cleanPageForPrinting() {
         hideButton(false)
-        activityUtil.disableViews(layout_constraint)
+        activityUtil.disableViews(binding.layoutConstraint)
 
         /**
          * Take screenshot now
@@ -541,7 +535,7 @@ class TruckDetailActivity : BaseActivity() {
         saveImageSub?.dispose()
         saveImageSub = null
 
-        saveImageSub = imageUtil.reactiveTakeScreenShot(content_scroll)
+        saveImageSub = imageUtil.reactiveTakeScreenShot(binding.contentScroll)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -571,9 +565,9 @@ class TruckDetailActivity : BaseActivity() {
 
     private fun hideButton(visible: Boolean) {
         if (visible) {
-            btnPrint.visibility = View.VISIBLE
+            binding.btnPrint.visibility = View.VISIBLE
         } else {
-            btnPrint.visibility = View.GONE
+            binding.btnPrint.visibility = View.GONE
         }
     }
 

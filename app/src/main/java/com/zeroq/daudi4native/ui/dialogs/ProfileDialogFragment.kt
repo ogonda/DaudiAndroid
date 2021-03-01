@@ -10,19 +10,21 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseUser
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.data.models.DepotModel
-import kotlinx.android.synthetic.main.fragment_profile_dialog.*
+import com.zeroq.daudi4native.databinding.FragmentProfileDialogBinding
 
 class ProfileDialogFragment(var user: FirebaseUser, var depo: DepotModel) : DialogFragment() {
+
+    private var _binding: FragmentProfileDialogBinding? = null
+
+    private val binding get() = _binding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(
-            R.layout.fragment_profile_dialog,
-            container,
-            false
-        )
+        _binding = FragmentProfileDialogBinding.inflate(inflater, container, false)
+        val view = binding?.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,20 +44,22 @@ class ProfileDialogFragment(var user: FirebaseUser, var depo: DepotModel) : Dial
     private fun initView() {
 
 
-        Glide.with(activity!!.applicationContext)
-            .load(user.photoUrl)
-            .centerCrop()
-            .placeholder(R.drawable.ic_circle)
-            .apply(RequestOptions.circleCropTransform())
-            .into(iv_profile)
+        binding?.let {
+            Glide.with(requireActivity().applicationContext)
+                .load(user.photoUrl)
+                .centerCrop()
+                .placeholder(R.drawable.ic_circle)
+                .apply(RequestOptions.circleCropTransform())
+                .into(it.ivProfile)
+        }
 
 
-        tv_name.text = user.displayName
-        tv_email.text = user.email
+        binding?.tvName?.text = user.displayName
+        binding?.tvEmail?.text = user.email
 
-        tv_depo.text = depo.Name
+        binding?.tvDepo?.text = depo.Name
 
-        close_dialog.setOnClickListener {
+        binding?.closeDialog?.setOnClickListener {
             dismiss()
         }
     }

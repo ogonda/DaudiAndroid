@@ -8,22 +8,26 @@ import androidx.fragment.app.DialogFragment
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.adapters.OmcSpinnerAdapter
 import com.zeroq.daudi4native.data.models.OmcModel
+import com.zeroq.daudi4native.databinding.FragmentAverageDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.AverageDialogEvent
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.fragment_average_dialog.*
 import org.jetbrains.anko.toast
 
 class AverageDialogFragment(var omcs: List<OmcModel>) : DialogFragment() {
+
+    private var _binding: FragmentAverageDialogBinding? = null
+
+    private val binding get() = _binding
 
     var averageEvent =
         PublishSubject.create<AverageDialogEvent>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(
-            R.layout.fragment_average_dialog,
-            container, false
-        )
+        _binding = FragmentAverageDialogBinding.inflate(inflater, container, false)
+        val view = binding?.root
+
+        return view
     }
 
 
@@ -44,26 +48,26 @@ class AverageDialogFragment(var omcs: List<OmcModel>) : DialogFragment() {
 
     private fun initView() {
 
-        val adapter = OmcSpinnerAdapter(activity!!.baseContext, R.layout.spinner_row, ArrayList(omcs))
-        spinner.adapter = adapter
+        val adapter = OmcSpinnerAdapter(requireActivity().baseContext, R.layout.spinner_row, ArrayList(omcs))
+        binding?.spinner!!.adapter = adapter
 
-        fuelCancel.setOnClickListener {
+        binding?.fuelCancel!!.setOnClickListener {
             dismiss()
         }
 
-        fuelSubmit.setOnClickListener {
+        binding?.fuelSubmit!!.setOnClickListener {
             validateAndSubmit()
         }
     }
 
 
     private fun validateAndSubmit() {
-        if (!pmsPrice.text.isBlank() || !agoPrice.text.isBlank() || !ikPrice.text.isBlank()) {
-            val spinnerOmc = spinner.selectedItem as OmcModel
+        if (!binding?.pmsPrice!!.text.isBlank() || !binding?.agoPrice!!.text.isBlank() || !binding?.ikPrice!!.text.isBlank()) {
+            val spinnerOmc = binding?.spinner!!.selectedItem as OmcModel
 
-            val pmcValue = if (pmsPrice.text.isBlank()) null else pmsPrice.text.toString().toDouble()
-            val agoValue = if (agoPrice.text.isBlank()) null else agoPrice.text.toString().toDouble()
-            val ikValue = if (ikPrice.text.isBlank()) null else ikPrice.text.toString().toDouble()
+            val pmcValue = if (binding?.pmsPrice!!.text.isBlank()) null else binding?.pmsPrice!!.text.toString().toDouble()
+            val agoValue = if (binding?.agoPrice!!.text.isBlank()) null else binding?.agoPrice!!.text.toString().toDouble()
+            val ikValue = if (binding?.ikPrice!!.text.isBlank()) null else binding?.ikPrice!!.text.toString().toDouble()
 
 
             val avgEvent = AverageDialogEvent(

@@ -11,12 +11,17 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.data.models.OrderModel
+import com.zeroq.daudi4native.databinding.FragmentLoadingDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.fragment_loading_dialog.*
 import kotlin.math.abs
 
 class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
+
+    private var _binding: FragmentLoadingDialogBinding? = null
+
+    private val binding get() = _binding
+
     var loadingEvent =
         PublishSubject.create<LoadingDialogEvent>()
 
@@ -26,11 +31,9 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(
-            R.layout.fragment_loading_dialog,
-            container,
-            false
-        )
+        _binding = FragmentLoadingDialogBinding.inflate(inflater, container, false)
+        val view = binding?.root
+        return view
     }
 
     override fun onResume() {
@@ -51,18 +54,18 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
     lateinit var belowViews: List<EditText>
 
     private fun viewInit() {
-        tv_loading_truck_id.text = "Truck ${order.QbConfig?.InvoiceId}"
+        binding?.tvLoadingTruckId?.text = "Truck ${order.QbConfig?.InvoiceId}"
 
         /**
          * cancel dialog
          * */
-        tv_loading_cancel.setOnClickListener {
+        binding?.tvLoadingCancel?.setOnClickListener {
             dismiss()
         }
 
         actuals = listOf(
-            Pair(et_pms_actual, order.fuel?.pms?.qty!!),
-            Pair(et_ago_actual, order.fuel?.ago?.qty!!), Pair(et_ik_actual, order.fuel?.ik?.qty!!)
+            Pair(binding?.etPmsActual!!, order.fuel?.pms?.qty!!),
+            Pair(binding?.etAgoActual!!, order.fuel?.ago?.qty!!), Pair(binding?.etIkActual!!, order.fuel?.ik?.qty!!)
         )
 
         /**
@@ -128,7 +131,7 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
             /**
              * make sure seals, broken, and delivery note number are not invalid
              * */
-            belowViews = listOf(et_seal_range, et_broken_seal, et_delivery_number)
+            belowViews = listOf(binding?.etSealRange!!, binding?.etBrokenSeal!!, binding?.etDeliveryNumber!!)
 
             belowViews.forEach { editText ->
                 editText.addTextChangedListener(object : TextWatcher {
@@ -162,7 +165,7 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
             /**
              * check if everything is valid
              * */
-            tv_loading_submit.setOnClickListener { validateForm() }
+            binding?.tvLoadingSubmit?.setOnClickListener { validateForm() }
         }
 
 
@@ -204,15 +207,15 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
         if (hasErrors) {
             Toast.makeText(activity, "You have errors", Toast.LENGTH_SHORT).show()
         } else {
-            val pmsAc = actualVal(et_pms_actual)
-            val agoAc = actualVal(et_ago_actual)
-            val ikAc = actualVal(et_ik_actual)
+            val pmsAc = actualVal(binding?.etPmsActual!!)
+            val agoAc = actualVal(binding?.etAgoActual!!)
+            val ikAc = actualVal(binding?.etIkActual!!)
 
             val eventx = LoadingDialogEvent(
                 ikAc, agoAc, pmsAc,
-                et_seal_range.text.toString(),
-                et_broken_seal.text.toString(),
-                et_delivery_number.text.toString()
+                binding?.etSealRange!!.text.toString(),
+                binding?.etBrokenSeal!!.text.toString(),
+                binding?.etDeliveryNumber!!.text.toString()
             )
 
             // push to subscribers

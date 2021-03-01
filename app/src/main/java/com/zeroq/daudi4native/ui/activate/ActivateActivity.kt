@@ -9,11 +9,13 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.zeroq.daudi4native.R
+import com.zeroq.daudi4native.databinding.ActivityActivateBinding
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.android.synthetic.main.activity_activate.*
 import javax.inject.Inject
 
 class ActivateActivity : DaggerAppCompatActivity() {
+
+    private lateinit var binding: ActivityActivateBinding
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -29,7 +31,9 @@ class ActivateActivity : DaggerAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_activate)
+        binding = ActivityActivateBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         initialize()
     }
 
@@ -41,12 +45,12 @@ class ActivateActivity : DaggerAppCompatActivity() {
             .centerCrop()
             .placeholder(R.drawable.place_holder)
             .apply(RequestOptions.circleCropTransform())
-            .into(adminImageView)
+            .into(binding.adminImageView)
 
-        displayNameTextView.text = firebaseUser?.displayName
+        binding.displayNameTextView.text = firebaseUser?.displayName
 
         // logout
-        logout_btn.setOnClickListener { authUI.signOut(this) }
+        binding.logoutBtn.setOnClickListener { authUI.signOut(this) }
     }
 
 }

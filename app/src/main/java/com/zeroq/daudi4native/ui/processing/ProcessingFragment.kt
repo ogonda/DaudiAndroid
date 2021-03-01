@@ -16,6 +16,7 @@ import com.zeroq.daudi4native.adapters.ProcessingTrucksAdapter
 import com.zeroq.daudi4native.commons.BaseFragment
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.FragmentProcessingBinding
 import com.zeroq.daudi4native.events.ProcessingEvent
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
 import com.zeroq.daudi4native.ui.truck_detail.TruckDetailActivity
@@ -23,7 +24,6 @@ import com.zeroq.daudi4native.utils.ActivityUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_processing.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -32,6 +32,10 @@ import java.util.*
 import javax.inject.Inject
 
 class ProcessingFragment : BaseFragment() {
+
+    private var _binding: FragmentProcessingBinding? = null
+
+    private val binding = _binding!!
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -61,7 +65,7 @@ class ProcessingFragment : BaseFragment() {
 
         processingViewModel = getViewModel(ProcessingViewModel::class.java)
 
-        processingViewModel.getUser().observe(this, Observer {
+        processingViewModel.getUser().observe(viewLifecycleOwner, Observer {
             if (it.isSuccessful) {
                 user = it.data()
                 processingViewModel.setDepoId(user?.config?.app?.depotid.toString())
@@ -75,13 +79,13 @@ class ProcessingFragment : BaseFragment() {
         * */
 
         initRecyclerView()
-        activityUtil.showProgress(spin_kit, true)
+        activityUtil.showProgress(binding.spinKit, true)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     fun onMessageEvent(event: ProcessingEvent) {
 
-        activityUtil.showProgress(spin_kit, false)
+        activityUtil.showProgress(binding.spinKit, false)
 
         Timber.e(event.error)
 
@@ -90,21 +94,21 @@ class ProcessingFragment : BaseFragment() {
             if (event.orders.isNullOrEmpty()) {
                 adapter.clear()
                 activityUtil.showTextViewState(
-                    empty_view, true, "No trucks are in Processing",
-                    ContextCompat.getColor(activity!!, R.color.colorPrimaryText)
+                    binding.emptyView, true, "No trucks are in Processing",
+                    ContextCompat.getColor(requireActivity(), R.color.colorPrimaryText)
                 )
             } else {
                 activityUtil.showTextViewState(
-                    empty_view, false, null, null
+                    binding.emptyView, false, null, null
                 )
                 adapter.replaceTrucks(event.orders)
             }
         } else {
             adapter.clear()
             activityUtil.showTextViewState(
-                empty_view, true,
+                binding.emptyView, true,
                 "Something went wrong please, close the application to see if the issue wll be solved",
-                ContextCompat.getColor(activity!!, R.color.pms)
+                ContextCompat.getColor(requireActivity(), R.color.pms)
             )
         }
     }
@@ -112,8 +116,8 @@ class ProcessingFragment : BaseFragment() {
     private fun initRecyclerView() {
         adapter = ProcessingTrucksAdapter(activityUtil)
 
-        processing_view.layoutManager = LinearLayoutManager(activity)
-        processing_view.adapter = adapter
+        binding.processingView.layoutManager = LinearLayoutManager(activity)
+        binding.processingView.adapter = adapter
     }
 
     private fun consumeEvents() {
@@ -176,7 +180,7 @@ class ProcessingFragment : BaseFragment() {
             }
         }
 
-        expireDialog.show(fragmentManager!!, _TAG)
+        expireDialog.show(requireFragmentManager(), _TAG)
     }
 
 
@@ -198,7 +202,7 @@ class ProcessingFragment : BaseFragment() {
                 })
         }
 
-        queueDialog.show(fragmentManager!!, _TAG)
+        queueDialog.show(requireFragmentManager(), _TAG)
     }
 
     override fun onStart() {
@@ -218,6 +222,6 @@ class ProcessingFragment : BaseFragment() {
         intent.putExtra("ORDER_ID", orderId)
         startActivity(intent)
         // animate
-        activity!!.overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left)
+        requireActivity().overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left)
     }
 }

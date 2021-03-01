@@ -6,18 +6,21 @@ import android.view.View
 import androidx.lifecycle.Observer
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.databinding.ActivitySplashBinding
 import com.zeroq.daudi4native.ui.MainActivity
 import com.zeroq.daudi4native.ui.activate.ActivateActivity
 import com.zeroq.daudi4native.ui.login.LoginActivity
-import kotlinx.android.synthetic.main.activity_splash.*
 
 class SplashActivity : BaseActivity() {
 
     private lateinit var viewModel: SplashViewModel
+    private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         // get viewmodel
         viewModel = getViewModel(SplashViewModel::class.java)
@@ -65,9 +68,9 @@ class SplashActivity : BaseActivity() {
 
     private fun showProgress(show: Boolean) {
         if (show) {
-            progressBar.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.VISIBLE
         } else {
-            progressBar.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
         }
     }
 }

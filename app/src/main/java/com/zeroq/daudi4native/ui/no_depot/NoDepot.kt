@@ -10,8 +10,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.databinding.ActivityNoDepotBinding
 import com.zeroq.daudi4native.ui.MainActivity
-import kotlinx.android.synthetic.main.activity_no_depot.*
 import javax.inject.Inject
 
 
@@ -24,6 +24,7 @@ class NoDepot : BaseActivity() {
     lateinit var authUI: AuthUI
 
     private lateinit var viewModel: NoDepotViewModel
+    private lateinit var binding: ActivityNoDepotBinding
 
     companion object {
         fun startActivity(context: Context) {
@@ -35,23 +36,25 @@ class NoDepot : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_no_depot)
+        binding = ActivityNoDepotBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         viewModel = getViewModel(NoDepotViewModel::class.java)
 
         firebaseAuth.currentUser?.let {
-            displayNameTextView?.text = it.displayName
+            binding.displayNameTextView?.text = it.displayName
 
             Glide.with(this)
                 .load(it.photoUrl)
                 .centerCrop()
                 .placeholder(R.drawable.place_holder)
                 .apply(RequestOptions.circleCropTransform())
-                .into(adminImageView)
+                .into(binding.adminImageView)
         }
 
         // logout
-        logout_btn_ext.setOnClickListener { authUI.signOut(this) }
+        binding.logoutBtnExt.setOnClickListener { authUI.signOut(this) }
 
         viewModel.getUser().observe(this, Observer {
             if (it.isSuccessful) {

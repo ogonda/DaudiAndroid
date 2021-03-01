@@ -8,9 +8,9 @@ import androidx.lifecycle.Observer
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.snackbar.Snackbar
 import com.zeroq.daudi4native.R
-import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.databinding.ActivityLoginBinding
 import com.zeroq.daudi4native.ui.MainActivity
 import com.zeroq.daudi4native.ui.activate.ActivateActivity
 
@@ -24,6 +24,7 @@ class LoginActivity : BaseActivity() {
 
     lateinit var loginViewModel: LoginViewModel
 
+    lateinit var binding: ActivityLoginBinding
 
     companion object {
         fun startActivity(context: Context) {
@@ -39,11 +40,13 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         loginViewModel = getViewModel(LoginViewModel::class.java)
 
-        sign_in_button.setOnClickListener {
+        binding.signInButton.setOnClickListener {
             startActivityForResult(googleSignInClient.signInIntent, loginViewModel.RC_SIGN_IN)
         }
 
@@ -65,23 +68,23 @@ class LoginActivity : BaseActivity() {
         loginViewModel.getLogin().observe(this, Observer {
 
             if (it.status == Status.LOADING) {
-                progressBar2.visibility = View.VISIBLE
+                binding.progressBar2.visibility = View.VISIBLE
             } else {
-                progressBar2.visibility = View.GONE
+                binding.progressBar2.visibility = View.GONE
             }
 
             when (it.status) {
                 Status.SUCCESS ->
                     Snackbar.make(
-                        main_layout,
+                        binding.mainLayout,
                         "Logged in successfully",
                         Snackbar.LENGTH_SHORT
                     ).show()
 
                 else ->
                     Snackbar.make(
-                        main_layout,
-                        "Sorry an error occured, try again",
+                        binding.mainLayout,
+                        "Sorry an error occurred, try again",
                         Snackbar.LENGTH_SHORT
                     ).show()
             }

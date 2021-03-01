@@ -18,6 +18,7 @@ import com.zeroq.daudi4native.commons.BaseFragment
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.FragmentLoadingBinding
 import com.zeroq.daudi4native.events.LoadingEvent
 import com.zeroq.daudi4native.ui.dialogs.LoadingDialogFragment
 import com.zeroq.daudi4native.ui.dialogs.TimeDialogFragment
@@ -26,7 +27,6 @@ import com.zeroq.daudi4native.utils.ActivityUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_loading.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -35,6 +35,10 @@ import java.util.*
 import javax.inject.Inject
 
 class LoadingFragment : BaseFragment() {
+
+    private var _binding: FragmentLoadingBinding? = null
+
+    private val binding get() = _binding!!
 
     @Inject
     lateinit var activityUtil: ActivityUtil
@@ -53,15 +57,16 @@ class LoadingFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        _binding = FragmentLoadingBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_loading, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = getViewModel(LoadingViewModel::class.java)
 
-        viewModel.getUser().observe(this, Observer {
+        viewModel.getUser().observe(viewLifecycleOwner, Observer {
             if (it.isSuccessful) {
                 userModel = it.data()
                 viewModel.setSwitchUser(userModel!!)
@@ -71,7 +76,7 @@ class LoadingFragment : BaseFragment() {
             }
         })
 
-        viewModel.getDepot().observe(this, Observer {
+        viewModel.getDepot().observe(viewLifecycleOwner, Observer {
             if (it.isSuccessful) {
                 depot = it.data()
             } else {
@@ -82,12 +87,12 @@ class LoadingFragment : BaseFragment() {
 
         initRecyclerView()
         createProgress()
-        activityUtil.showProgress(spin_kit_l, true)
+        activityUtil.showProgress(binding.spinKitL, true)
     }
 
     lateinit var progressDialog: Dialog
     private fun createProgress() {
-        progressDialog = Dialog(activity!!)
+        progressDialog = Dialog(requireActivity())
         progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         progressDialog.setContentView(R.layout.custom_progress_dialog)
         progressDialog.setCancelable(false)
@@ -95,7 +100,7 @@ class LoadingFragment : BaseFragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     fun onMessageEvent(event: LoadingEvent) {
-        activityUtil.showProgress(spin_kit_l, false)
+        activityUtil.showProgress(binding.spinKitL, false)
 
         if (event.error == null) {
 
@@ -103,12 +108,12 @@ class LoadingFragment : BaseFragment() {
                 adapter.clear()
 
                 activityUtil.showTextViewState(
-                    empty_view_l, true, "No trucks are in Loading",
-                    ContextCompat.getColor(activity!!, R.color.colorPrimaryText)
+                    binding.emptyViewL, true, "No trucks are in Loading",
+                    ContextCompat.getColor(requireActivity(), R.color.colorPrimaryText)
                 )
             } else {
                 activityUtil.showTextViewState(
-                    empty_view_l, false, null, null
+                    binding.emptyViewL, false, null, null
                 )
                 adapter.replaceTrucks(event.orders)
             }
@@ -116,9 +121,9 @@ class LoadingFragment : BaseFragment() {
             adapter.clear()
 
             activityUtil.showTextViewState(
-                empty_view_l, true,
+                binding.emptyViewL, true,
                 "Something went wrong please, close the application to see if the issue wll be solved",
-                ContextCompat.getColor(activity!!, R.color.pms)
+                ContextCompat.getColor(requireActivity(), R.color.pms)
             )
         }
     }
@@ -126,8 +131,8 @@ class LoadingFragment : BaseFragment() {
     private fun initRecyclerView() {
         adapter = LoadingTrucksAdapter(activityUtil)
 
-        loading_view.layoutManager = LinearLayoutManager(activity)
-        loading_view.adapter = adapter
+        binding.loadingView.layoutManager = LinearLayoutManager(activity)
+        binding.loadingView.adapter = adapter
     }
 
 
@@ -187,7 +192,7 @@ class LoadingFragment : BaseFragment() {
             }
         }
 
-        expireDialog.show(fragmentManager!!, _TAG)
+        expireDialog.show(requireFragmentManager(), _TAG)
     }
 
     var sealSub: Disposable? = null
@@ -221,7 +226,7 @@ class LoadingFragment : BaseFragment() {
                     }
                 }
 
-                sealDialog.show(fragmentManager!!, _TAG)
+                sealDialog.show(requireFragmentManager(), _TAG)
             } else {
                 startLoadingOrderActivity(order.Id!!)
             }

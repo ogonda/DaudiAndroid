@@ -14,11 +14,12 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
+import com.zeroq.daudi4native.databinding.ActivityDeviceListBinding
 import com.zeroq.daudi4native.services.BluetoothService
-import kotlinx.android.synthetic.main.activity_device_list.*
 
 class DeviceListActivity : BaseActivity() {
 
+    private lateinit var binding: ActivityDeviceListBinding
     private var mService: BluetoothService? = null
     private var mPairedDevicesArrayAdapter: ArrayAdapter<String>? = null
     private var mNewDevicesArrayAdapter: ArrayAdapter<String>? = null
@@ -29,7 +30,9 @@ class DeviceListActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_device_list)
+        binding = ActivityDeviceListBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
 
         // Initialize array adapters. One for already paired devices and
@@ -40,11 +43,11 @@ class DeviceListActivity : BaseActivity() {
         /**
          * set adapters
          * */
-        paired_devices.adapter = mPairedDevicesArrayAdapter
-        paired_devices.onItemClickListener = mDeviceClickListener
+        binding.pairedDevices.adapter = mPairedDevicesArrayAdapter
+        binding.pairedDevices.onItemClickListener = mDeviceClickListener
 
-        new_devices.adapter = mNewDevicesArrayAdapter
-        new_devices.onItemClickListener = mDeviceClickListener
+        binding.newDevices.adapter = mNewDevicesArrayAdapter
+        binding.newDevices.onItemClickListener = mDeviceClickListener
 
         // Register for broadcasts when a device is discovered
         var filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -64,7 +67,7 @@ class DeviceListActivity : BaseActivity() {
 
         // If there are paired devices, add each one to the ArrayAdapter
         if (pairedDevices.size > 0) {
-            title_paired_devices.visibility = View.VISIBLE
+            binding.titlePairedDevices.visibility = View.VISIBLE
 
             for (device in pairedDevices) {
                 val d = device.name + "\n" + device.address
@@ -78,7 +81,7 @@ class DeviceListActivity : BaseActivity() {
         // Set result CANCELED incase the user backs out
         setResult(Activity.RESULT_CANCELED)
 
-        button_scan.setOnClickListener {
+        binding.buttonScan.setOnClickListener {
             it.visibility = View.GONE
             doDiscovery()
         }
@@ -124,7 +127,7 @@ class DeviceListActivity : BaseActivity() {
         /**
          * start scanning indicator
          * */
-        title_new_devices.visibility = View.VISIBLE
+        binding.titleNewDevices.visibility = View.VISIBLE
 
         if (mService!!.isDiscovering) {
             mService!!.cancelDiscovery()

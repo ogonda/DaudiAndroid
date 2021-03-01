@@ -9,11 +9,15 @@ import androidx.fragment.app.DialogFragment
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.TruckModel
+import com.zeroq.daudi4native.databinding.FragmentTimeDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.TimeDialogEvent
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.fragment_time_dialog.*
 
 class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragment() {
+
+    private var _binding: FragmentTimeDialogBinding? = null
+
+    private val binding get() = _binding
 
     private var _minutes: Int = 0
     private var _hours: Int = 0
@@ -21,12 +25,12 @@ class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragm
     var timeEvent = PublishSubject.create<TimeDialogEvent>()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(
-            R.layout.fragment_time_dialog,
-            container,
-            false
-        )
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+
+        _binding = FragmentTimeDialogBinding.inflate(inflater, container, false)
+        val view = binding?.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,45 +48,44 @@ class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragm
 
     private fun viewInit() {
 
-        tv_dialog_title.text = title
-        tv_truck_id.text = "Truck ${order.QbConfig?.InvoiceId}"
+        binding?.tvDialogTitle?.text = title
+        binding?.tvTruckId?.text = "Truck ${order.QbConfig?.InvoiceId}"
 
-
-        ib_up_hour.setOnClickListener {
+        binding?.ibUpHour?.setOnClickListener {
             _hours += 1
             if (_hours > 5) _hours = 0
-            tv_hour.text = _hours.toString()
+            binding?.tvHour?.text = _hours.toString()
         }
 
-        ib_down_hour.setOnClickListener {
+        binding?.ibDownHour?.setOnClickListener {
             _hours -= 1
             if (_hours < 0) _hours = 5
-            tv_hour.text = _hours.toString()
+            binding?.tvHour?.text = _hours.toString()
         }
 
         /*
         * minutes
         * */
-        ib_up_minute.setOnClickListener {
+        binding?.ibUpMinute?.setOnClickListener {
             _minutes += 10
             if (_minutes > 60) _minutes = 0
-            tv_minute.text = _minutes.toString()
+            binding?.tvMinute?.text = _minutes.toString()
         }
 
-        ib_down_minute.setOnClickListener {
+        binding?.ibDownMinute?.setOnClickListener {
             _minutes -= 10
             if (_minutes < 0) _minutes = 60
-            tv_minute.text = _minutes.toString()
+            binding?.tvMinute?.text = _minutes.toString()
         }
 
         /**
          * cancel and set buttons
          * */
-        tv_cancel.setOnClickListener {
+        binding?.tvCancel?.setOnClickListener {
             dismiss()
         }
 
-        tv_set.setOnClickListener {
+        binding?.tvSet?.setOnClickListener {
             if ((_hours + _minutes) == 0) {
                 Toast.makeText(activity, "you need to add time", Toast.LENGTH_SHORT).show()
             } else {

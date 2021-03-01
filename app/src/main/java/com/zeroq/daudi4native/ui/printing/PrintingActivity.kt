@@ -18,11 +18,12 @@ import androidx.lifecycle.Observer
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.ActivityPreviewBinding
+import com.zeroq.daudi4native.databinding.ActivityPrintingBinding
+import com.zeroq.daudi4native.databinding.ToolbarBinding
 import com.zeroq.daudi4native.services.BluetoothService
 import com.zeroq.daudi4native.ui.device_list.DeviceListActivity
 import com.zeroq.daudi4native.utils.PrintPic
-import kotlinx.android.synthetic.main.activity_printing.*
-import kotlinx.android.synthetic.main.activity_truck_detail.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
 import java.lang.Exception
@@ -30,6 +31,8 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 
 class PrintingActivity : BaseActivity() {
+
+    private lateinit var binding: ActivityPrintingBinding
 
     lateinit var printingViewModel: PrintingViewModel
 
@@ -62,6 +65,7 @@ class PrintingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityPrintingBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_printing)
 
 
@@ -83,8 +87,8 @@ class PrintingActivity : BaseActivity() {
             }
         })
 
-
-        setSupportActionBar(toolbar as Toolbar)
+        lateinit var toolbarBinding: ToolbarBinding
+        setSupportActionBar(toolbarBinding as Toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_close)
 
@@ -116,15 +120,15 @@ class PrintingActivity : BaseActivity() {
          * check if bluetooth is on
          * */
         if (mService!!.isBTopen) {
-            btnClose?.isEnabled = true
-            btnSearch?.isEnabled = true
+            binding.btnClose?.isEnabled = true
+            binding.btnSearch?.isEnabled = true
 
         } else {
             val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT)
 
-            btnClose?.isEnabled = false
-            btnSearch?.isEnabled = false
+            binding.btnClose?.isEnabled = false
+            binding.btnSearch?.isEnabled = false
         }
 
     }
@@ -136,10 +140,10 @@ class PrintingActivity : BaseActivity() {
     }
 
     private fun operationBtns() {
-        btn_print?.setOnClickListener(clickEvent())
-        btnSearch?.setOnClickListener(clickEvent())
-        btnClose?.setOnClickListener(clickEvent())
-        btnSandbox?.setOnClickListener(clickEvent())
+        binding.btnPrint?.setOnClickListener(clickEvent())
+        binding.btnSearch?.setOnClickListener(clickEvent())
+        binding.btnClose?.setOnClickListener(clickEvent())
+        binding.btnSandbox?.setOnClickListener(clickEvent())
     }
 
     private fun checkBluetoothState() {
@@ -148,8 +152,8 @@ class PrintingActivity : BaseActivity() {
                 BluetoothService.MESSAGE_STATE_CHANGE -> when (msg.arg1) {
                     BluetoothService.STATE_CONNECTED -> {
                         toast("Connect successful")
-                        btnClose?.isEnabled = true
-                        btn_print?.isEnabled = true
+                        binding.btnClose?.isEnabled = true
+                        binding.btnPrint?.isEnabled = true
                     }
                     BluetoothService.STATE_CONNECTING -> {
                         Timber.d("Connecting")
@@ -164,8 +168,8 @@ class PrintingActivity : BaseActivity() {
                 BluetoothService.MESSAGE_CONNECTION_LOST -> {
                     toast("Device connection was lost")
 
-                    btnClose?.isEnabled = false
-                    btn_print?.isEnabled = false
+                    binding.btnClose?.isEnabled = false
+                    binding.btnPrint?.isEnabled = false
                 }
                 BluetoothService.MESSAGE_UNABLE_CONNECT -> {
                     Toast.makeText(
@@ -188,16 +192,16 @@ class PrintingActivity : BaseActivity() {
     internal inner class clickEvent : View.OnClickListener {
         override fun onClick(v: View) {
             when (v) {
-                btnSearch -> {
+                binding.btnSearch -> {
                     val intent = Intent(this@PrintingActivity, DeviceListActivity::class.java)
                     startActivityForResult(intent, REQUEST_CONNECT_DEVICE)
                 }
 
-                btnClose -> {
+                binding.btnClose -> {
                     cleanUp()
                 }
 
-                btn_print -> {
+                binding.btnPrint -> {
 //                    Thread { }.start()
                     try {
                         startPrintingProcess()
@@ -208,7 +212,7 @@ class PrintingActivity : BaseActivity() {
                     }
                 }
 
-                btnSandbox -> {
+                binding.btnSandbox -> {
                     databasePrintTransactions()
                 }
             }
@@ -222,7 +226,7 @@ class PrintingActivity : BaseActivity() {
         when (requestCode) {
             REQUEST_ENABLE_BT -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    btnSearch.isEnabled = true
+                    binding.btnSearch.isEnabled = true
                     toast("Bluetooth open successful")
                 } else {
                     finish()

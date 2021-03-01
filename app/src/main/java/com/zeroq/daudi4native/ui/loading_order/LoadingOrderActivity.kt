@@ -12,6 +12,7 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.internal.ViewUtils.dpToPx
@@ -28,6 +29,8 @@ import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.data.models.OrderModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.ActivityLoadingOrderBinding
+import com.zeroq.daudi4native.databinding.ToolbarBinding
 import com.zeroq.daudi4native.ui.preview.PreviewActivity
 import com.zeroq.daudi4native.ui.printing.PrintingActivity
 import com.zeroq.daudi4native.utils.ActivityUtil
@@ -38,9 +41,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_loading_order.*
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.toolbar.*
 import net.glxn.qrgen.android.QRCode
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -53,6 +53,8 @@ import kotlin.collections.ArrayList
 class LoadingOrderActivity : BaseActivity() {
 
     lateinit var viewModel: LoadingOrderViewModel
+
+    lateinit var binding: ActivityLoadingOrderBinding
 
     @Inject
     lateinit var imageUtil: ImageUtil
@@ -87,10 +89,12 @@ class LoadingOrderActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_loading_order)
+        binding = ActivityLoadingOrderBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         /**
-         * hide keyboad
+         * hide keyboard
          * */
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         setUpToolbar()
@@ -114,13 +118,13 @@ class LoadingOrderActivity : BaseActivity() {
                * add recycler adapter
                * */
         adapter = UploadNotesAdapter(storageReference)
-        notesRecycler.adapter = adapter
-        notesRecycler!!.layoutManager = LinearLayoutManager(
+        binding.notesRecycler.adapter = adapter
+        binding.notesRecycler!!.layoutManager = LinearLayoutManager(
             applicationContext,
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(5, resources), true))
+        binding.notesRecycler.addItemDecoration(AdapterSpacer(6, utils.dpToPx(5, resources), true))
 
         /*
         * test data
@@ -158,6 +162,7 @@ class LoadingOrderActivity : BaseActivity() {
     }
 
     private fun setUpToolbar() {
+        lateinit var toolbar: Toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.title = "GatePass"
     }
@@ -179,7 +184,7 @@ class LoadingOrderActivity : BaseActivity() {
             if (it.isSuccessful) {
                 depot = it.data()
                 it.data()?.let { depo ->
-                    tv_depot_name.text = "[ ${depo.Name} ]"
+                    binding.tvDepotName.text = "[ ${depo.Name} ]"
                 }
             } else {
                 depot = null
@@ -187,7 +192,7 @@ class LoadingOrderActivity : BaseActivity() {
             }
         })
 
-        inputs = listOf(et_seal, et_broken_seals, et_delivery_note)
+        inputs = listOf(binding.etSeal, binding.etBrokenSeals, binding.etDeliveryNote)
 
         inputs.forEach { et ->
             et.addTextChangedListener(object : TextWatcher {
@@ -240,30 +245,30 @@ class LoadingOrderActivity : BaseActivity() {
     private fun initialOrderValues(orderModel: OrderModel) {
 
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm aaa")
-        tv_today_date.text = sdf.format(Date()).toUpperCase()
+        binding.tvTodayDate.text = sdf.format(Date()).toUpperCase()
 
 
-        tv_truck_id.text = orderModel.QbConfig?.InvoiceNumber
+        binding.tvTruckId.text = orderModel.QbConfig?.InvoiceNumber
 
         // driver data
-        tv_driver_value.text = orderModel.truck?.driverdetail?.name
-        tv_driver_passport_value.text = orderModel.truck?.driverdetail?.id
-        tv_number_plate_value.text = orderModel.truck?.truckdetail?.numberplate
-        tv_organisation_value.text = orderModel.customer?.name
+        binding.tvDriverValue.text = orderModel.truck?.driverdetail?.name
+        binding.tvDriverPassportValue.text = orderModel.truck?.driverdetail?.id
+        binding.tvNumberPlateValue.text = orderModel.truck?.truckdetail?.numberplate
+        binding.tvOrganisationValue.text = orderModel.customer?.name
 
         // inputs
         val seals = orderModel.seals
 
 
-        et_delivery_note.setText(orderModel?.deliveryNote?.value)
-        et_seal.setText(seals?.range?.joinToString("-"))
-        et_broken_seals.setText(seals?.broken?.joinToString("-"))
+        binding.etDeliveryNote.setText(orderModel?.deliveryNote?.value)
+        binding.etSeal.setText(seals?.range?.joinToString("-"))
+        binding.etBrokenSeals.setText(seals?.broken?.joinToString("-"))
 
 
         // fuel
-        tv_pms_value.text = orderModel.fuel?.pms?.qty.toString()
-        tv_ago_value.text = orderModel.fuel?.ago?.qty.toString()
-        tv_ik_value.text = orderModel.fuel?.ik?.qty.toString()
+        binding.tvPmsValue.text = orderModel.fuel?.pms?.qty.toString()
+        binding.tvAgoValue.text = orderModel.fuel?.ago?.qty.toString()
+        binding.tvIkValue.text = orderModel.fuel?.ik?.qty.toString()
 
         val depotUrl = "https://daudi.africa/orders/${orderModel.Id}"
 
@@ -275,13 +280,13 @@ class LoadingOrderActivity : BaseActivity() {
                 .bitmap()
 
             runOnUiThread {
-                iv_qr.setImageBitmap(myBitmap)
+                binding.ivQr.setImageBitmap(myBitmap)
             }
         })
 
         thread.start()
 
-        btnPrint.setOnClickListener {
+        binding.btnPrint.setOnClickListener {
             if (!validateErrors()) {
                 requestPermissions()
             }
@@ -327,9 +332,9 @@ class LoadingOrderActivity : BaseActivity() {
 
         viewModel.updateSeals(
             _user, liveOrder.Id!!,
-            et_seal.text.toString(),
-            et_broken_seals.text.toString(),
-            et_delivery_note.text.toString()
+            binding.etSeal.text.toString(),
+            binding.etBrokenSeals.text.toString(),
+            binding.etDeliveryNote.text.toString()
         ).observe(this, Observer {
             if (it.isSuccessful) {
                 print()
@@ -344,8 +349,8 @@ class LoadingOrderActivity : BaseActivity() {
 
     var saveImageSub: Disposable? = null
     private fun print() {
-        activityUtil.disableViews(layout_constraint)
-        btnPrint?.isEnabled = true
+        activityUtil.disableViews(binding.layoutConstraint)
+        binding.btnPrint?.isEnabled = true
 
         hideButton(true)
 
@@ -353,7 +358,7 @@ class LoadingOrderActivity : BaseActivity() {
         saveImageSub?.dispose()
         saveImageSub = null
 
-        saveImageSub = imageUtil.reactiveTakeScreenShot(content_scroll)
+        saveImageSub = imageUtil.reactiveTakeScreenShot(binding.contentScroll)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -385,7 +390,7 @@ class LoadingOrderActivity : BaseActivity() {
         if (requestCode == REQUEST_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data != null && data.extras != null) {
                 val imageBitMap = data.extras?.get("data") as Bitmap;
-                iv_mk_logo.setImageBitmap(imageBitMap)
+                binding.ivMkLogo.setImageBitmap(imageBitMap)
                 uploadImage(imageBitMap)
             }
         }
@@ -416,7 +421,7 @@ class LoadingOrderActivity : BaseActivity() {
                 })
 
         }.addOnFailureListener {
-            toast("A n error occurred nothing was uploaded")
+            toast("An error occurred nothing was uploaded")
             Timber.e(it)
         }
 
@@ -425,11 +430,11 @@ class LoadingOrderActivity : BaseActivity() {
 
     private fun hideButton(hide: Boolean) {
         if (hide) {
-            btnPrint.visibility = View.GONE
-            notesRecycler.visibility = View.GONE
+            binding.btnPrint.visibility = View.GONE
+            binding.notesRecycler.visibility = View.GONE
         } else {
-            btnPrint.visibility = View.VISIBLE
-            notesRecycler.visibility = View.VISIBLE
+            binding.btnPrint.visibility = View.VISIBLE
+            binding.notesRecycler.visibility = View.VISIBLE
         }
     }
 

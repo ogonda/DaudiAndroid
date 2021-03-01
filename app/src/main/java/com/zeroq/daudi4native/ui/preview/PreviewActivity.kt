@@ -9,7 +9,7 @@ import android.view.WindowManager
 import com.google.firebase.storage.StorageReference
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.commons.BaseActivity
-import kotlinx.android.synthetic.main.activity_preview.*
+import com.zeroq.daudi4native.databinding.ActivityPreviewBinding
 import javax.inject.Inject
 
 
@@ -18,11 +18,15 @@ class PreviewActivity : BaseActivity() {
     @Inject
     lateinit var storageReference: StorageReference
 
+    private lateinit var binding: ActivityPreviewBinding
+
     private var path: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preview)
+        binding = ActivityPreviewBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         toolbar()
 
         if (intent.hasExtra(IMAGE_PATH)) {
@@ -43,7 +47,7 @@ class PreviewActivity : BaseActivity() {
 
             pathReference.getBytes(ONE_MEGABYTE.toLong()).addOnSuccessListener { data ->
                 val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-                ivPhoto.setImageBitmap(bitmap)
+                binding.ivPhoto.setImageBitmap(bitmap)
             }
 
         }

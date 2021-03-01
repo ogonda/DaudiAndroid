@@ -5,6 +5,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import com.google.firebase.auth.FirebaseAuth
 import com.zeroq.daudi4native.R
@@ -12,13 +13,9 @@ import com.zeroq.daudi4native.commons.BaseActivity
 import com.zeroq.daudi4native.data.models.AveragePriceModel
 import com.zeroq.daudi4native.data.models.OmcModel
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.*
 import com.zeroq.daudi4native.ui.dialogs.AverageDialogFragment
 import com.zeroq.daudi4native.ui.dialogs.data.AverageDialogEvent
-import kotlinx.android.synthetic.main.activity_average_price.*
-import kotlinx.android.synthetic.main.ago_average_card.*
-import kotlinx.android.synthetic.main.ik_average_card.*
-import kotlinx.android.synthetic.main.pms_average_card.*
-import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -28,6 +25,10 @@ import kotlin.collections.ArrayList
 
 class AveragePriceActivity : BaseActivity() {
 
+    private lateinit var binding: ActivityAveragePriceBinding
+    private lateinit var binding_2: PmsAverageCardBinding
+    private lateinit var binding_3: AgoAverageCardBinding
+    private lateinit var binding_4: IkAverageCardBinding
 
     lateinit var viewModel: AverageViewModel
     private var omcs: List<OmcModel>? = null
@@ -40,16 +41,23 @@ class AveragePriceActivity : BaseActivity() {
 
     fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_average_price)
+
+        binding = ActivityAveragePriceBinding.inflate(layoutInflater)
+        binding_2 = PmsAverageCardBinding.inflate(layoutInflater)
+        binding_3 = AgoAverageCardBinding.inflate(layoutInflater)
+        binding_4 = IkAverageCardBinding.inflate(layoutInflater)
+
+        val view = binding.root
+        setContentView(view)
 
         viewModel = getViewModel(AverageViewModel::class.java)
 
 
         setupToolbar()
 
-        pmsAverageParent.setOnClickListener { toggleSlide(pmsPriceList) }
-        agoAverageParent.setOnClickListener { toggleSlide(agoPriceList) }
-        ikAverageParent.setOnClickListener { toggleSlide(ikPriceList) }
+        binding_2.pmsAverageParent.setOnClickListener { toggleSlide(binding_2.pmsPriceList) }
+        binding_3.agoAverageParent.setOnClickListener { toggleSlide(binding_3.agoPriceList) }
+        binding_4.ikAverageParent.setOnClickListener { toggleSlide(binding_4.ikPriceList) }
 
         viewModel.getOmcs().observe(this, Observer {
             if (it.isSuccessful) {
@@ -73,7 +81,7 @@ class AveragePriceActivity : BaseActivity() {
 
         populateFuelView()
 
-        addFuel.setOnClickListener {
+        binding.addFuel.setOnClickListener {
             if (!omcs.isNullOrEmpty()) {
                 val dialog = AverageDialogFragment(omcs!!)
                 dialog.show(supportFragmentManager, "average")
@@ -93,7 +101,7 @@ class AveragePriceActivity : BaseActivity() {
 
 
     }
-
+    lateinit var toolbar: Toolbar
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
 
@@ -186,12 +194,12 @@ class AveragePriceActivity : BaseActivity() {
     private fun pmsView(pmsPrices: ArrayList<AveragePriceModel>) {
         if (pmsPrices.isEmpty()) {
             // empty values
-            pmsPriceAverage.amount = 0.00f
-            pmsLastEdit.text = "Never"
-            pmsPriceList.removeAllViews()
+            binding_2.pmsPriceAverage.amount = 0.00f
+            binding_2.pmsLastEdit.text = "Never"
+            binding_2.pmsPriceList.removeAllViews()
         } else {
 
-            pmsLastEdit.text = getFormattedDateUser(
+            binding_2.pmsLastEdit.text = getFormattedDateUser(
                 pmsPrices[pmsPrices.lastIndex].user?.time!!,
                 pmsPrices[pmsPrices.lastIndex].user?.name!!
             )
@@ -201,9 +209,9 @@ class AveragePriceActivity : BaseActivity() {
                 totalPrice += it.price!!
             }
 
-            pmsPriceAverage.amount = (totalPrice / pmsPrices.size).toFloat()
+            binding_2.pmsPriceAverage.amount = (totalPrice / pmsPrices.size).toFloat()
 
-            pmsPriceList.removeAllViews()
+            binding_2.pmsPriceList.removeAllViews()
             pmsPrices.forEach {
                 val view: View = layoutInflater.inflate(R.layout.single_price_row, null)
                 val fuelPrice: TextView = view.findViewById(R.id.fuelPrice)
@@ -231,7 +239,7 @@ class AveragePriceActivity : BaseActivity() {
                     true
                 }
 
-                pmsPriceList.addView(view)
+                binding_2.pmsPriceList.addView(view)
             }
         }
     }
@@ -239,12 +247,12 @@ class AveragePriceActivity : BaseActivity() {
     private fun agoView(agoPrices: ArrayList<AveragePriceModel>) {
         if (agoPrices.isEmpty()) {
             // empty values
-            agoPriceAverage.amount = 0.00f
-            agoLastEdit.text = "Never"
-            agoPriceList.removeAllViews()
+            binding_3.agoPriceAverage.amount = 0.00f
+            binding_3.agoLastEdit.text = "Never"
+            binding_3.agoPriceList.removeAllViews()
         } else {
 
-            agoLastEdit.text = getFormattedDateUser(
+            binding_3.agoLastEdit.text = getFormattedDateUser(
                 agoPrices[agoPrices.lastIndex].user?.time!!,
                 agoPrices[agoPrices.lastIndex].user?.name!!
             )
@@ -254,9 +262,9 @@ class AveragePriceActivity : BaseActivity() {
                 totalPrice += it.price!!
             }
 
-            agoPriceAverage.amount = (totalPrice / agoPrices.size).toFloat()
+            binding_3.agoPriceAverage.amount = (totalPrice / agoPrices.size).toFloat()
 
-            agoPriceList.removeAllViews()
+            binding_3.agoPriceList.removeAllViews()
             agoPrices.forEach {
                 val view: View = layoutInflater.inflate(R.layout.single_price_row, null)
                 val fuelPrice: TextView = view.findViewById(R.id.fuelPrice)
@@ -288,7 +296,7 @@ class AveragePriceActivity : BaseActivity() {
                 }
 
 
-                agoPriceList.addView(view)
+                binding_3.agoPriceList.addView(view)
             }
         }
     }
@@ -297,12 +305,12 @@ class AveragePriceActivity : BaseActivity() {
     private fun ikView(ikPrices: ArrayList<AveragePriceModel>) {
         if (ikPrices.isEmpty()) {
             // empty values
-            ikPriceAverage.amount = 0.00f
-            ikLastEdit.text = "Never"
-            ikPriceList.removeAllViews()
+            binding_4.ikPriceAverage.amount = 0.00f
+            binding_4.ikLastEdit.text = "Never"
+            binding_4.ikPriceList.removeAllViews()
         } else {
 
-            ikLastEdit.text = getFormattedDateUser(
+            binding_4.ikLastEdit.text = getFormattedDateUser(
                 ikPrices[ikPrices.lastIndex].user?.time!!,
                 ikPrices[ikPrices.lastIndex].user?.name!!
             )
@@ -312,9 +320,9 @@ class AveragePriceActivity : BaseActivity() {
                 totalPrice += it.price!!
             }
 
-            ikPriceAverage.amount = (totalPrice / ikPrices.size).toFloat()
+            binding_4.ikPriceAverage.amount = (totalPrice / ikPrices.size).toFloat()
 
-            ikPriceList.removeAllViews()
+            binding_4.ikPriceList.removeAllViews()
             ikPrices.forEach {
                 val view: View = layoutInflater.inflate(R.layout.single_price_row, null)
                 val fuelPrice: TextView = view.findViewById(R.id.fuelPrice)
@@ -342,7 +350,7 @@ class AveragePriceActivity : BaseActivity() {
                 }
 
 
-                ikPriceList.addView(view)
+                binding_4.ikPriceList.addView(view)
             }
         }
     }

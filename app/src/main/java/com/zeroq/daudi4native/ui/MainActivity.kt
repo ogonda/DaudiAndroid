@@ -46,8 +46,6 @@ import com.zeroq.daudi4native.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.toolbar.toolbar
 import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -56,6 +54,8 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 import androidx.lifecycle.distinctUntilChanged
 import com.zeroq.daudi4native.data.models.UserModel
+import com.zeroq.daudi4native.databinding.ActivityMainBinding
+import com.zeroq.daudi4native.databinding.ToolbarBinding
 
 
 class MainActivity : BaseActivity() {
@@ -84,6 +84,8 @@ class MainActivity : BaseActivity() {
 
     private lateinit var mainViewModel: MainViewModel
 
+    private lateinit var binding: ActivityMainBinding
+
     private var depot: DepotModel? = null
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -98,7 +100,11 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        val view = binding.root
+
+        setContentView(view)
 
         mainViewModel = getViewModel(MainViewModel::class.java)
 
@@ -155,7 +161,8 @@ class MainActivity : BaseActivity() {
         findNavController(R.id.mainNavFragment).navigateUp()
 
     private fun setToolbar() {
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar!!.title = "Emkay"
 
 
@@ -189,7 +196,7 @@ class MainActivity : BaseActivity() {
 
     private fun setupBottomNavigationBar() {
         val navController = findNavController(this, R.id.mainNavFragment)
-        bottom_nav.setupWithNavController(navController)
+        binding.bottomNav.setupWithNavController(navController)
     }
 
     private fun setLogo(d: Drawable) {
@@ -284,21 +291,21 @@ class MainActivity : BaseActivity() {
                 * set the badges on navbar
                 * **/
                 if (processingL.size > 0) {
-                    bottom_nav.getOrCreateBadge(R.id.processing)?.number = processingL.size
+                    binding.bottomNav.getOrCreateBadge(R.id.processing)?.number = processingL.size
                 } else {
-                    bottom_nav.removeBadge(R.id.processing)
+                    binding.bottomNav.removeBadge(R.id.processing)
                 }
 
                 if (queueingL.size > 0) {
-                    bottom_nav.getOrCreateBadge(R.id.queued)?.number = queueingL.size
+                    binding.bottomNav.getOrCreateBadge(R.id.queued)?.number = queueingL.size
                 } else {
-                    bottom_nav.removeBadge(R.id.queued)
+                    binding.bottomNav.removeBadge(R.id.queued)
                 }
 
                 if (loadingL.size > 0) {
-                    bottom_nav.getOrCreateBadge(R.id.loading)?.number = loadingL.size
+                    binding.bottomNav.getOrCreateBadge(R.id.loading)?.number = loadingL.size
                 } else {
-                    bottom_nav.removeBadge(R.id.loading)
+                    binding.bottomNav.removeBadge(R.id.loading)
                 }
 
             } else {
@@ -321,10 +328,10 @@ class MainActivity : BaseActivity() {
 
     private fun showNetworkState(show: Boolean, msg: String?) {
         if (show) {
-            internet_error.visibility = View.VISIBLE
-            state_message.text = msg
+            binding.internetError.visibility = View.VISIBLE
+            binding.stateMessage.text = msg
         } else {
-            internet_error.visibility = View.GONE
+            binding.internetError.visibility = View.GONE
         }
     }
 

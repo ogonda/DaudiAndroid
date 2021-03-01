@@ -23,7 +23,6 @@ class LoginViewModel @Inject constructor(var firebaseAuth: FirebaseAuth, adminRe
     ViewModel() {
 
     val RC_SIGN_IN = 200
-
     private var _loginData = MutableLiveData<MResource<AuthResult>>()
     private var _userId = MutableLiveData<String>()
     private var _user: LiveData<Resource<UserModel>> = MutableLiveData()
