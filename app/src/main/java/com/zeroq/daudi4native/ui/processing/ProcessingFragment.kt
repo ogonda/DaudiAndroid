@@ -35,7 +35,8 @@ class ProcessingFragment : BaseFragment() {
 
     private var _binding: FragmentProcessingBinding? = null
 
-    private val binding = _binding!!
+    val _binding1 = _binding
+    private val binding = _binding1 ?: throw NullPointerException("Expression '_binding' must not be null")
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -56,7 +57,7 @@ class ProcessingFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         try {
             _binding = FragmentProcessingBinding.inflate(inflater, container, false)
         }
