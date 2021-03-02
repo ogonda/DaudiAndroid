@@ -26,7 +26,7 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.installations.FirebaseInstallations
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.broadcasts.TruckExpireBroadCast
 import com.zeroq.daudi4native.commons.BaseActivity
@@ -413,7 +413,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun postTokenToServer() {
-        FirebaseInstanceId.getInstance().instanceId
+        FirebaseInstallations.getInstance().getToken(true)
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Timber.e(task.exception)
