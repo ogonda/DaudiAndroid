@@ -164,7 +164,7 @@ class MainActivity : BaseActivity() {
         try {
             bool = findNavController(R.id.mainNavFragment).navigateUp()
         } catch (e: Exception) {
-            Log.d("error we're looking for", e.toString())
+            Timber.d(e.toString())
         }
         return bool
     }
