@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -159,11 +160,11 @@ class MainActivity : BaseActivity() {
 
 
     override fun onSupportNavigateUp(): Boolean {
-        var bool: Boolean = true
+        var bool = true
         try {
             bool = findNavController(R.id.mainNavFragment).navigateUp()
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.d("error we're looking for", e.toString())
         }
         return bool
     }
