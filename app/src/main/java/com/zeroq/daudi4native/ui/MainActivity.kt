@@ -158,8 +158,15 @@ class MainActivity : BaseActivity() {
     }
 
 
-    override fun onSupportNavigateUp(): Boolean =
-        findNavController(R.id.mainNavFragment).navigateUp()
+    override fun onSupportNavigateUp(): Boolean {
+        var bool: Boolean = true
+        try {
+            bool = findNavController(R.id.mainNavFragment).navigateUp()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+        return bool
+    }
 
     private fun setToolbar() {
 
