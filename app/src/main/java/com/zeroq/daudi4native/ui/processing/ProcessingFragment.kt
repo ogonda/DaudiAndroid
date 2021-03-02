@@ -57,7 +57,13 @@ class ProcessingFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_processing, container, false)
+        try {
+            _binding = FragmentProcessingBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception) {
+            Timber.e(e)
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,7 +132,7 @@ class ProcessingFragment : BaseFragment() {
         val clickSub: Disposable = adapter.expireTvClick
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                val now = Calendar.getInstance();
+                val now = Calendar.getInstance()
 
                 if (it.order.truckStageData!!["1"]?.expiry!![0].expiry!!.before(now.time)) {
                     expireTimePicker(it.order)

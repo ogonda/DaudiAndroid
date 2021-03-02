@@ -12,6 +12,7 @@ import com.zeroq.daudi4native.data.models.TruckModel
 import com.zeroq.daudi4native.databinding.FragmentTimeDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.TimeDialogEvent
 import io.reactivex.subjects.PublishSubject
+import timber.log.Timber
 
 class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragment() {
 
@@ -28,9 +29,13 @@ class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragm
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        _binding = FragmentTimeDialogBinding.inflate(inflater, container, false)
-        val view = binding?.root
-        return view
+        try {
+            _binding = FragmentTimeDialogBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception){
+            Timber.e(e)
+        }
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

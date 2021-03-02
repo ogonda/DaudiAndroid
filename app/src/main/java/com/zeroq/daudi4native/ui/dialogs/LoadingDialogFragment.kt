@@ -15,6 +15,7 @@ import com.zeroq.daudi4native.databinding.FragmentLoadingDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.LoadingDialogEvent
 import io.reactivex.subjects.PublishSubject
 import kotlin.math.abs
+import timber.log.Timber
 
 class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
 
@@ -31,9 +32,13 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentLoadingDialogBinding.inflate(inflater, container, false)
-        val view = binding?.root
-        return view
+        try {
+            _binding = FragmentLoadingDialogBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception){
+            Timber.e(e)
+        }
+        return binding?.root
     }
 
     override fun onResume() {

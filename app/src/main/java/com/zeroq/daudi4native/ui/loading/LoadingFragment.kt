@@ -57,7 +57,13 @@ class LoadingFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentLoadingBinding.inflate(inflater, container, false)
+
+        try {
+            _binding = FragmentLoadingBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception) {
+            Timber.e(e)
+        }
         // Inflate the layout for this fragment
         return binding.root
     }

@@ -11,6 +11,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.zeroq.daudi4native.R
 import com.zeroq.daudi4native.data.models.DepotModel
 import com.zeroq.daudi4native.databinding.FragmentProfileDialogBinding
+import timber.log.Timber
+import java.lang.Exception
 
 class ProfileDialogFragment(var user: FirebaseUser, var depo: DepotModel) : DialogFragment() {
 
@@ -22,9 +24,13 @@ class ProfileDialogFragment(var user: FirebaseUser, var depo: DepotModel) : Dial
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentProfileDialogBinding.inflate(inflater, container, false)
-        val view = binding?.root
-        return view
+        try {
+            _binding = FragmentProfileDialogBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception){
+            Timber.e(e)
+        }
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

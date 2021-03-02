@@ -28,7 +28,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
-            android:text="What is your name younfg man"
+            android:text="What is your name young man"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/adminImageView"/>
@@ -41,7 +41,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
             android:gravity="center"
-            android:text="Sorry, It seems you are not activated yet please call 0718101442 for activation"
+            android:text="Sorry, it seems you are not activated yet. Please call 0718101442 for activation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"

@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
+import java.sql.Time
 import java.util.*
 import javax.inject.Inject
 
@@ -52,10 +53,15 @@ class QueuedFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentQueuedBinding.inflate(inflater, container, false)
-        val view = binding.root
+
+        try {
+            _binding = FragmentQueuedBinding.inflate(inflater, container, false)
+        }
+        catch (e: Exception) {
+            Timber.e(e)
+        }
         // Inflate the layout for this fragment
-        return view
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
