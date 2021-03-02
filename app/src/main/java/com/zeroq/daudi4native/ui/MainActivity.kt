@@ -217,7 +217,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun operations() {
-        mainViewModel.getUser().distinctUntilChanged().observe(this, Observer {
+        mainViewModel.getUser().distinctUntilChanged().observe(this, {
 
             if (it.isSuccessful) {
                 it.data()?.config?.app?.depotid?.let { depotId ->
@@ -236,7 +236,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        mainViewModel.getDepot().observe(this, Observer {
+        mainViewModel.getDepot().observe(this, {
             if (it.isSuccessful) {
                 depot = it.data()
 
@@ -250,7 +250,7 @@ class MainActivity : BaseActivity() {
         })
 
         // get update
-        mainViewModel.getOrders().observe(this, Observer {
+        mainViewModel.getOrders().observe(this, {
             if (it.isSuccessful) {
                 val processingL = ArrayList<OrderModel>()
                 val loadingL = ArrayList<OrderModel>()
@@ -431,7 +431,7 @@ class MainActivity : BaseActivity() {
                 // Get new Instance ID token
                 val token = task.result?.token
 
-                mainViewModel.postToken(token!!).observe(this, Observer {
+                mainViewModel.postToken(token!!).observe(this, {
                     if (!it.isSuccessful) {
                         Timber.e(it.error())
                     }
