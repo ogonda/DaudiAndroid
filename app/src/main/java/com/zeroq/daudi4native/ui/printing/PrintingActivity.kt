@@ -87,8 +87,9 @@ class PrintingActivity : BaseActivity() {
             }
         })
 
-        lateinit var toolbarBinding: ToolbarBinding
-        setSupportActionBar(toolbarBinding as Toolbar)
+        lateinit var toolbar: Toolbar
+
+        setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_close)
 
@@ -120,15 +121,15 @@ class PrintingActivity : BaseActivity() {
          * check if bluetooth is on
          * */
         if (mService!!.isBTopen) {
-            binding.btnClose?.isEnabled = true
-            binding.btnSearch?.isEnabled = true
+            binding.btnClose.isEnabled = true
+            binding.btnSearch.isEnabled = true
 
         } else {
             val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT)
 
-            binding.btnClose?.isEnabled = false
-            binding.btnSearch?.isEnabled = false
+            binding.btnClose.isEnabled = false
+            binding.btnSearch.isEnabled = false
         }
 
     }
@@ -140,10 +141,10 @@ class PrintingActivity : BaseActivity() {
     }
 
     private fun operationBtns() {
-        binding.btnPrint?.setOnClickListener(clickEvent())
-        binding.btnSearch?.setOnClickListener(clickEvent())
-        binding.btnClose?.setOnClickListener(clickEvent())
-        binding.btnSandbox?.setOnClickListener(clickEvent())
+        binding.btnPrint.setOnClickListener(clickEvent())
+        binding.btnSearch.setOnClickListener(clickEvent())
+        binding.btnClose.setOnClickListener(clickEvent())
+        binding.btnSandbox.setOnClickListener(clickEvent())
     }
 
     private fun checkBluetoothState() {
@@ -152,8 +153,8 @@ class PrintingActivity : BaseActivity() {
                 BluetoothService.MESSAGE_STATE_CHANGE -> when (msg.arg1) {
                     BluetoothService.STATE_CONNECTED -> {
                         toast("Connect successful")
-                        binding.btnClose?.isEnabled = true
-                        binding.btnPrint?.isEnabled = true
+                        binding.btnClose.isEnabled = true
+                        binding.btnPrint.isEnabled = true
                     }
                     BluetoothService.STATE_CONNECTING -> {
                         Timber.d("Connecting")
@@ -168,8 +169,8 @@ class PrintingActivity : BaseActivity() {
                 BluetoothService.MESSAGE_CONNECTION_LOST -> {
                     toast("Device connection was lost")
 
-                    binding.btnClose?.isEnabled = false
-                    binding.btnPrint?.isEnabled = false
+                    binding.btnClose.isEnabled = false
+                    binding.btnPrint.isEnabled = false
                 }
                 BluetoothService.MESSAGE_UNABLE_CONNECT -> {
                     Toast.makeText(

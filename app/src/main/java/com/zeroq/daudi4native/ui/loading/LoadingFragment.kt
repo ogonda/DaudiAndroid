@@ -56,14 +56,8 @@ class LoadingFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        try {
-            _binding = FragmentLoadingBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception) {
-            Timber.e(e)
-        }
+    ): View {
+        _binding = FragmentLoadingBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
         return binding.root
     }

@@ -24,15 +24,9 @@ class ProfileDialogFragment(var user: FirebaseUser, var depo: DepotModel) : Dial
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        try {
-            _binding = FragmentProfileDialogBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception){
-            Timber.e(e)
-        }
+        _binding = FragmentProfileDialogBinding.inflate(inflater, container, false)
         return binding?.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

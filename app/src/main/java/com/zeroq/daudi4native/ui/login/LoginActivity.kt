@@ -67,11 +67,13 @@ class LoginActivity : BaseActivity() {
          * */
         loginViewModel.getLogin().observe(this, Observer {
 
+           /**
             if (it.status == Status.LOADING) {
                 binding.progressBar2.visibility = View.VISIBLE
             } else {
                 binding.progressBar2.visibility = View.GONE
             }
+            **/
 
             when (it.status) {
                 Status.SUCCESS ->
@@ -80,7 +82,12 @@ class LoginActivity : BaseActivity() {
                         "Logged in successfully",
                         Snackbar.LENGTH_SHORT
                     ).show()
-
+                Status.LOADING ->
+                    Snackbar.make(
+                        binding.mainLayout,
+                        "Loading",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 else ->
                     Snackbar.make(
                         binding.mainLayout,
@@ -92,12 +99,13 @@ class LoginActivity : BaseActivity() {
 
         loginViewModel.getUser().observe(this, Observer {
             loginInvoked = !loginInvoked
-            if (loginInvoked)
+            if (loginInvoked) {
                 if (it.isSuccessful) {
                     MainActivity.startActivity(this)
                 } else {
                     ActivateActivity.startActivity(this)
                 }
+            }
             this.finish()
         })
     }

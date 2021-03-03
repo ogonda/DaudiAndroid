@@ -36,7 +36,7 @@ class LoginViewModel @Inject constructor(var firebaseAuth: FirebaseAuth, adminRe
         _loginData.value = MResource(Status.LOADING, null, "")
 
         when (RC_SIGN_IN) {
-            RC_SIGN_IN -> {
+            requestCode -> {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 try {
                     // Google Sign In was successful, authenticate with Firebase

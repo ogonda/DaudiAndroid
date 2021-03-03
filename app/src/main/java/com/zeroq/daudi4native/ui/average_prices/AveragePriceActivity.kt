@@ -30,6 +30,8 @@ class AveragePriceActivity : BaseActivity() {
     private lateinit var binding_3: AgoAverageCardBinding
     private lateinit var binding_4: IkAverageCardBinding
 
+    lateinit var toolbar: Toolbar
+
     lateinit var viewModel: AverageViewModel
     private var omcs: List<OmcModel>? = null
     private var userModel: UserModel? = null
@@ -101,7 +103,7 @@ class AveragePriceActivity : BaseActivity() {
 
 
     }
-    lateinit var toolbar: Toolbar
+
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
 

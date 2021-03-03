@@ -28,13 +28,7 @@ class TimeDialogFragment(var title: String, var order: OrderModel) : DialogFragm
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        try {
-            _binding = FragmentTimeDialogBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception){
-            Timber.e(e)
-        }
+        _binding = FragmentTimeDialogBinding.inflate(inflater, container, false)
         return binding?.root
     }
 

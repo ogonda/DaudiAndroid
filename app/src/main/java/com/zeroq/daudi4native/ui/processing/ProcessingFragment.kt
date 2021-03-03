@@ -35,8 +35,7 @@ class ProcessingFragment : BaseFragment() {
 
     private var _binding: FragmentProcessingBinding? = null
 
-    val _binding1 = _binding
-    private val binding = _binding1 ?: throw NullPointerException("Expression '_binding' must not be null")
+    private val binding get() = _binding
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -58,13 +57,8 @@ class ProcessingFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        try {
-            _binding = FragmentProcessingBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception) {
-            Timber.e(e)
-        }
-        return binding.root
+        _binding = FragmentProcessingBinding.inflate(inflater, container, false)
+        return binding?.root!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,13 +80,13 @@ class ProcessingFragment : BaseFragment() {
         * */
 
         initRecyclerView()
-        activityUtil.showProgress(binding.spinKit, true)
+        activityUtil.showProgress(binding?.spinKit!!, true)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     fun onMessageEvent(event: ProcessingEvent) {
 
-        activityUtil.showProgress(binding.spinKit, false)
+        activityUtil.showProgress(binding?.spinKit!!, false)
 
         Timber.e(event.error)
 
@@ -101,19 +95,19 @@ class ProcessingFragment : BaseFragment() {
             if (event.orders.isNullOrEmpty()) {
                 adapter.clear()
                 activityUtil.showTextViewState(
-                    binding.emptyView, true, "No trucks are in Processing",
+                    binding?.emptyView!!, true, "No trucks are in Processing",
                     ContextCompat.getColor(requireActivity(), R.color.colorPrimaryText)
                 )
             } else {
                 activityUtil.showTextViewState(
-                    binding.emptyView, false, null, null
+                    binding?.emptyView!!, false, null, null
                 )
                 adapter.replaceTrucks(event.orders)
             }
         } else {
             adapter.clear()
             activityUtil.showTextViewState(
-                binding.emptyView, true,
+                binding?.emptyView!!, true,
                 "Something went wrong please, close the application to see if the issue wll be solved",
                 ContextCompat.getColor(requireActivity(), R.color.pms)
             )
@@ -123,8 +117,8 @@ class ProcessingFragment : BaseFragment() {
     private fun initRecyclerView() {
         adapter = ProcessingTrucksAdapter(activityUtil)
 
-        binding.processingView.layoutManager = LinearLayoutManager(activity)
-        binding.processingView.adapter = adapter
+        binding?.processingView!!.layoutManager = LinearLayoutManager(activity)
+        binding?.processingView!!.adapter = adapter
     }
 
     private fun consumeEvents() {

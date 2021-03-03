@@ -12,7 +12,6 @@ import com.zeroq.daudi4native.databinding.FragmentAverageDialogBinding
 import com.zeroq.daudi4native.ui.dialogs.data.AverageDialogEvent
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.anko.toast
-import timber.log.Timber
 
 class AverageDialogFragment(var omcs: List<OmcModel>) : DialogFragment() {
 
@@ -26,13 +25,7 @@ class AverageDialogFragment(var omcs: List<OmcModel>) : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        try
-        {
         _binding = FragmentAverageDialogBinding.inflate(inflater, container, false)
-        }
-    catch (e: Exception){
-        Timber.e(e)
-    }
         return binding?.root
     }
 

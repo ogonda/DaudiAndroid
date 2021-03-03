@@ -32,15 +32,9 @@ class LoadingDialogFragment(var order: OrderModel) : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        try {
-            _binding = FragmentLoadingDialogBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception){
-            Timber.e(e)
-        }
+        _binding = FragmentLoadingDialogBinding.inflate(inflater, container, false)
         return binding?.root
     }
-
     override fun onResume() {
         super.onResume()
         dialog?.window?.setLayout(

@@ -54,12 +54,8 @@ class QueuedFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        try {
-            _binding = FragmentQueuedBinding.inflate(inflater, container, false)
-        }
-        catch (e: Exception) {
-            Timber.e(e)
-        }
+        _binding = FragmentQueuedBinding.inflate(inflater, container, false)
+
         // Inflate the layout for this fragment
         return binding.root
     }
