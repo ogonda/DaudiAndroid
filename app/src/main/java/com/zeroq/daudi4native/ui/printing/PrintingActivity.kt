@@ -34,6 +34,8 @@ class PrintingActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPrintingBinding
 
+    lateinit var toolbar: Toolbar
+
     lateinit var printingViewModel: PrintingViewModel
 
     private var mService: BluetoothService? = null
@@ -87,7 +89,7 @@ class PrintingActivity : BaseActivity() {
             }
         })
 
-        lateinit var toolbar: Toolbar
+
 
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -207,7 +209,7 @@ class PrintingActivity : BaseActivity() {
                     try {
                         startPrintingProcess()
                     } catch (e: Exception) {
-                        toast("An error occured try again")
+                        toast("An error occurred try again")
                     } finally {
                         databasePrintTransactions()
                     }

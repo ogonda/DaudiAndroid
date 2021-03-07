@@ -54,7 +54,6 @@ class AveragePriceActivity : BaseActivity() {
 
         viewModel = getViewModel(AverageViewModel::class.java)
 
-
         setupToolbar()
 
         binding_2.pmsAverageParent.setOnClickListener { toggleSlide(binding_2.pmsPriceList) }
