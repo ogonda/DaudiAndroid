@@ -68,7 +68,7 @@ class PrintingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPrintingBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_printing)
+        setContentView(binding.root)
 
 
 
@@ -91,7 +91,7 @@ class PrintingActivity : BaseActivity() {
 
 
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_close)
 
