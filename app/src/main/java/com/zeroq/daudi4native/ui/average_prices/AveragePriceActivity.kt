@@ -29,6 +29,7 @@ class AveragePriceActivity : BaseActivity() {
     private lateinit var binding_2: PmsAverageCardBinding
     private lateinit var binding_3: AgoAverageCardBinding
     private lateinit var binding_4: IkAverageCardBinding
+    private lateinit var binding_5: ToolbarBinding
 
     lateinit var toolbar: Toolbar
 
@@ -48,6 +49,7 @@ class AveragePriceActivity : BaseActivity() {
         binding_2 = PmsAverageCardBinding.inflate(layoutInflater)
         binding_3 = AgoAverageCardBinding.inflate(layoutInflater)
         binding_4 = IkAverageCardBinding.inflate(layoutInflater)
+        binding_5 = ToolbarBinding.inflate(layoutInflater)
 
         val view = binding.root
         setContentView(view)
@@ -104,7 +106,8 @@ class AveragePriceActivity : BaseActivity() {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(binding_5.toolbar)
 
         supportActionBar?.title = "Average Prices"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
