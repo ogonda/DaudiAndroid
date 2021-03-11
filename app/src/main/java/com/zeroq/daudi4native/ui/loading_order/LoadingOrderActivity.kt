@@ -163,9 +163,7 @@ class LoadingOrderActivity : BaseActivity() {
 
     private fun setUpToolbar() {
 
-        //TODO check if this is problematic
-        lateinit var toolbar: Toolbar
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.title = "GatePass"
     }
 
